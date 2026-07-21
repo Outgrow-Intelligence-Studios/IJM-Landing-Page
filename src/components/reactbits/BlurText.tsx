@@ -51,16 +51,13 @@ const BlurText: React.FC<BlurTextProps> = ({
     if (!ref.current) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.unobserve(ref.current as Element);
-        }
+        setInView(entry.isIntersecting);
       },
-      { threshold, rootMargin }
+      { threshold: 0.2, rootMargin }
     );
     observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [threshold, rootMargin]);
+  }, [rootMargin]);
 
   const defaultFrom = useMemo(
     () =>
@@ -88,7 +85,7 @@ const BlurText: React.FC<BlurTextProps> = ({
   const times = Array.from({ length: stepCount }, (_, i) => (stepCount === 1 ? 0 : i / (stepCount - 1)));
 
   return (
-    <p ref={ref} className={`blur-text ${className} flex flex-wrap`}>
+    <p ref={ref} className={`blur-text ${className} flex flex-wrap justify-center`}>
       {elements.map((segment, index) => {
         const animateKeyframes = buildKeyframes(fromSnapshot, toSnapshots);
 

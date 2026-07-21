@@ -1,29 +1,65 @@
 "use client";
 
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect, useRef } from "react";
 import Image from "next/image";
-import { 
-  Phone, 
-  Mail, 
-  MapPin, 
-  User, 
-  CheckCircle, 
-  Shield, 
-  Maximize2, 
-  Trees, 
-  Building, 
-  Award, 
+import {
+  Phone,
+  Mail,
+  MapPin,
+  User,
+  CheckCircle,
+  Shield,
+  Maximize2,
+  Trees,
+  Building,
+  Award,
   Compass,
   Menu,
   X,
   Star,
-  Check
 } from "lucide-react";
 
-import SpotlightCard from "@/components/reactbits/SpotlightCard";
+// ReactBits Components
 import ShinyText from "@/components/reactbits/ShinyText";
 import BlurText from "@/components/reactbits/BlurText";
-import DecryptedText from "@/components/reactbits/DecryptedText";
+import CountUp from "@/components/reactbits/CountUp";
+import Magnet from "@/components/reactbits/Magnet";
+import GlareHover from "@/components/reactbits/GlareHover";
+
+// GSAP & Lenis
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── ASSET PATHS (mapped from local renders) ───
+const RENDERS = {
+  hero: "/renders/3000/ijm-harmony-evening-to-ni8.jpg",
+  aerial: "/renders/3000/ijm-harmony-aerial-shot-3k.jpg",
+  entrance: "/renders/3000/ijm-entrace-shot-3k.jpg",
+  elevation: "/renders/3000/ijm-harmony-elevation-shot-3k.jpg",
+  elevationBlock: "/renders/3000/ijm-harmony-elevation-block-1-3k.jpg",
+  backElevation: "/renders/3000/ijm-harmony-back-side-elevation3k.jpg",
+  ramp: "/renders/3000/ijm-harmony-ramp-to-two-elevation-3k.jpg",
+  fountain: "/renders/3000/ijm-harmony-water-fountain-3k.jpg",
+  aerialOpt: "/renders/3000/ijm-harmony-aerial-opt-3k.jpg",
+  // Landscape (1500px) — grid cards
+  chitChat: "/renders/landscape/cijm-harmony-chit-chat-park.jpg",
+  childPlay: "/renders/landscape/ijm-harmony-child-playarea.jpg",
+  cricket: "/renders/landscape/ijm-harmony-cricket-pitch.jpg",
+  miyawaki: "/renders/landscape/ijm-harmony-miyawaki-mini-shot.jpg",
+  multiSport: "/renders/landscape/ijm-harmony-multi-sport-court.jpg",
+  sportLawn: "/renders/landscape/ijm-harmony-multi-sport-lawn.jpg",
+  library: "/renders/landscape/ijm-harmony-out-door-library.jpg",
+  gym: "/renders/landscape/ijm-harmony-outdoor-gym.jpg",
+  peace: "/renders/landscape/ijm-harmony-peace-park.jpg",
+  topAngle: "/renders/landscape/ijm-harmony-top-angle-shot.jpg",
+  walking: "/renders/landscape/ijm-harmony-walking-park.jpg",
+  // Interiors
+  balcony: "/renders/interiors/IJM_Balcony_3K.jpg",
+  bedroom: "/renders/interiors/IJM_Bedroom_3K.jpg",
+};
 
 // Form Interface
 interface FormData {
@@ -36,114 +72,59 @@ interface FormData {
 }
 
 export default function LandingPage() {
-  // Mobile menu state
+  // States
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-  // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("Enquire Now");
-  
-  // Success state
   const [showSuccess, setShowSuccess] = useState(false);
-  
-  // Floor plan active tab state
+  const [activePriceTab, setActivePriceTab] = useState<"2bhk" | "2.5bhk" | "3bhk">("2bhk");
   const [activeFloorTab, setActiveFloorTab] = useState<"2bhk" | "2.5bhk" | "3bhk">("2bhk");
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Form states
-  const [heroForm, setHeroForm] = useState<FormData>({
-    name: "",
-    phone: "",
-    email: "",
-    config: "2 BHK"
-  });
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const [visitForm, setVisitForm] = useState<FormData>({
-    name: "",
-    phone: "",
-    email: "",
-    config: "2.5 BHK",
-    date: ""
+    name: "", phone: "", email: "", config: "2.5 BHK", date: ""
   });
-
   const [modalForm, setModalForm] = useState<FormData>({
-    name: "",
-    phone: "",
-    email: "",
-    config: "3 BHK",
-    message: ""
+    name: "", phone: "", email: "", config: "3 BHK", message: ""
   });
-
-  // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const mainRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const heroTextRef = useRef<HTMLDivElement>(null);
+  const heroCtaRef = useRef<HTMLDivElement>(null);
+
+  // Validation
   const validateForm = (data: FormData): boolean => {
     const tempErrors: Record<string, string> = {};
     if (!data.name.trim()) tempErrors.name = "Name is required";
-    
     const phonePattern = /^[6-9]\d{9}$/;
-    if (!data.phone.trim()) {
-      tempErrors.phone = "Phone is required";
-    } else if (!phonePattern.test(data.phone)) {
-      tempErrors.phone = "Phone must be a valid 10-digit number";
-    }
-    
+    if (!data.phone.trim()) tempErrors.phone = "Phone is required";
+    else if (!phonePattern.test(data.phone)) tempErrors.phone = "Enter valid 10-digit number";
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!data.email.trim()) {
-      tempErrors.email = "Email is required";
-    } else if (!emailPattern.test(data.email)) {
-      tempErrors.email = "Invalid email format";
-    }
-
+    if (!data.email.trim()) tempErrors.email = "Email is required";
+    else if (!emailPattern.test(data.email)) tempErrors.email = "Invalid email format";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
-  };
-
-  const handleHeroSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (validateForm(heroForm)) {
-      // TODO: Wire form to CRM/email backend — currently shows success state only
-      console.log("Hero Form Submitted: ", heroForm);
-      setShowSuccess(true);
-      resetForms();
-    }
   };
 
   const handleVisitSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (validateForm(visitForm)) {
-      // TODO: Wire form to CRM/email backend — currently shows success state only
-      console.log("Visit Form Submitted: ", visitForm);
       setShowSuccess(true);
-      resetForms();
+      setVisitForm({ name: "", phone: "", email: "", config: "2.5 BHK", date: "" });
+      setErrors({});
     }
   };
 
   const handleModalSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (validateForm(modalForm)) {
-      // TODO: Wire form to CRM/email backend — currently shows success state only
-      console.log("Modal Form Submitted: ", modalForm);
       setIsModalOpen(false);
       setShowSuccess(true);
-      resetForms();
+      setModalForm({ name: "", phone: "", email: "", config: "3 BHK", message: "" });
+      setErrors({});
     }
-  };
-
-  const resetForms = () => {
-    setHeroForm({ name: "", phone: "", email: "", config: "2 BHK" });
-    setVisitForm({ name: "", phone: "", email: "", config: "2.5 BHK", date: "" });
-    setModalForm({ name: "", phone: "", email: "", config: "3 BHK", message: "" });
-    setErrors({});
   };
 
   const openEnquiryModal = (title: string, defaultBhk: string) => {
@@ -152,1696 +133,826 @@ export default function LandingPage() {
     setIsModalOpen(true);
   };
 
-  // Sticky Header logic for background style changes on scroll
-  const [isScrolled, setIsScrolled] = useState(false);
+  // Scroll listener for header
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  return (
-    <div className="relative min-h-screen font-sans text-gray-900 bg-gray-50 antialiased selection:bg-gold selection:text-navy">
-      
-      {/* Right side sticky enquire tab (Vertical writing mode, Gold background) */}
-      <button 
-        onClick={() => openEnquiryModal("Quick Enquiry", "2.5 BHK")}
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-[#C9A227] hover:bg-gold-light text-[#1a2744] font-black py-5 px-3 uppercase tracking-widest text-[11px] shadow-2xl transition-all duration-300 rounded-l-lg select-none hidden lg:block"
-        style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-      >
-        Enquire Now
-      </button>
+  // Lenis + GSAP ScrollTrigger (Mobile: skip Lenis entirely)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-      {/* Sticky Navbar (White/transparent Serenity style) */}
-      <header 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled 
-            ? "bg-[#0f1e3d]/95 backdrop-blur-md shadow-lg border-b border-gold/15 py-3" 
-            : "bg-transparent py-5"
-        }`}
-      >
+    const isMobile = window.innerWidth < 768;
+    let lenis: Lenis | null = null;
+
+    // Only use Lenis on desktop — mobile uses native scroll (zero lag)
+    if (!isMobile) {
+      lenis = new Lenis({
+        duration: 1.4,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        smoothTouch: false,
+      });
+
+      function raf(time: number) {
+        lenis!.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add((time) => lenis!.raf(time * 1000));
+      gsap.ticker.lagSmoothing(0);
+    }
+
+    // GSAP scroll-triggered animations
+    const ctx = gsap.context(() => {
+
+      // ═══════ HERO — No animation, just visible ═══════
+      if (heroCtaRef.current) {
+        heroCtaRef.current.style.opacity = "1";
+      }
+
+      // Fade-up animations (lightweight, GPU-only props)
+      gsap.utils.toArray<HTMLElement>(".gsap-fade-up").forEach((el) => {
+        gsap.to(el, {
+          opacity: 1,
+          y: 0,
+          duration: isMobile ? 0.5 : 0.9,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 90%",
+            toggleActions: "play none none none",
+          },
+        });
+      });
+
+      gsap.utils.toArray<HTMLElement>(".stagger-container").forEach((container) => {
+        const cards = container.querySelectorAll(".stagger-item");
+        gsap.fromTo(cards,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1, y: 0,
+            duration: isMobile ? 0.4 : 0.7,
+            stagger: isMobile ? 0.06 : 0.12,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: container,
+              start: "top 90%",
+            },
+          }
+        );
+      });
+    }, mainRef);
+
+    return () => {
+      if (lenis) lenis.destroy();
+      ctx.revert();
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
+  }, []);
+
+  return (
+    <div ref={mainRef} className="relative min-h-screen text-[#f5f0e8] bg-[#151515] antialiased selection:bg-[#C29B57] selection:text-[#151515]">
+
+      {/* ═══════ STICKY NAVBAR ═══════ */}
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? "bg-[#0a0e1a]/95 backdrop-blur-md py-3 shadow-lg" : "bg-transparent py-5"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center">
-              <a href="#hero" className="flex items-center">
-                <Image 
-                  src="/images/footer-logo.png" 
-                  alt="IJM First City Logo" 
-                  width={80}
-                  height={40}
-                  className="object-contain"
-                  priority
-                />
-              </a>
-            </div>
-
-            {/* Nav Links Center */}
-            <nav className="hidden lg:flex items-center space-x-6 text-sm text-white font-semibold">
-              <a href="#hero" className="hover:text-gold transition-colors">Home</a>
-              <a href="#overview" className="hover:text-gold transition-colors">Overview</a>
-              <a href="#why-ijm" className="hover:text-gold transition-colors">Highlights</a>
-              <a href="#amenities" className="hover:text-gold transition-colors">Amenities</a>
-              <a href="#overview" className="hover:text-gold transition-colors">Gallery</a>
-              <a href="#configurations" className="hover:text-gold transition-colors">Price List</a>
-              <a href="#floor-plans" className="hover:text-gold transition-colors">Floor Plan</a>
-              <a href="#connectivity" className="hover:text-gold transition-colors">Location</a>
+            <a href="#hero" className="flex items-center">
+              <Image src="/images/footer-logo.png" alt="IJM First City" width={72} height={36} className="object-contain lg:w-[96px] lg:h-[48px]" priority />
+            </a>
+            <nav className="hidden lg:flex items-center gap-8 text-[10px] uppercase tracking-[0.2em] text-[#f5f0e8]/70 font-bold">
+              <a href="#overview" className="hover:text-[#C29B57] transition-colors">Overview</a>
+              <a href="#amenities" className="hover:text-[#C29B57] transition-colors">Amenities</a>
+              <a href="#floor-plans" className="hover:text-[#C29B57] transition-colors">Floor Plans</a>
+              <a href="#configurations" className="hover:text-[#C29B57] transition-colors">Pricing</a>
+              <a href="#connectivity" className="hover:text-[#C29B57] transition-colors">Location</a>
             </nav>
-
-            {/* Phone Number Right in Bordered Box */}
-            <div className="hidden md:flex items-center">
-              <a 
-                href="tel:+919920511119" 
-                className="flex items-center gap-2 text-white border border-white/30 hover:border-gold hover:text-gold transition-all duration-300 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-lg"
-              >
-                <Phone size={14} className="text-gold" />
-                <span>+91 99205 11119</span>
+            <div className="flex items-center gap-3">
+              <a href="tel:+919920511119" className="hidden md:flex items-center gap-2 pill-btn pill-btn-outline text-[10px]">
+                <Phone size={12} /><span>+91 99205 11119</span>
               </a>
-            </div>
-
-            {/* Mobile Menu Trigger */}
-            <div className="flex items-center lg:hidden space-x-3">
-              <a 
-                href="tel:+919920511119" 
-                className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center"
-                aria-label="Call Sales"
-              >
-                <Phone size={16} className="text-gold" />
-              </a>
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-white hover:text-gold p-1"
-                aria-label="Toggle menu"
-              >
-                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden text-white hover:text-[#C29B57] p-1" aria-label="Toggle menu">
+                {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
             </div>
           </div>
         </div>
-
-        {/* Mobile Menu Overlay */}
         {isMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-[#0f1e3d] border-b border-gold/15 py-6 px-4 shadow-xl flex flex-col space-y-4 lg:hidden">
-            <nav className="flex flex-col space-y-3 text-gray-300 text-base font-semibold">
-              <a href="#hero" onClick={() => setIsMenuOpen(false)} className="hover:text-gold py-1">Home</a>
-              <a href="#overview" onClick={() => setIsMenuOpen(false)} className="hover:text-gold py-1">Overview</a>
-              <a href="#why-ijm" onClick={() => setIsMenuOpen(false)} className="hover:text-gold py-1">Highlights</a>
-              <a href="#amenities" onClick={() => setIsMenuOpen(false)} className="hover:text-gold py-1">Amenities</a>
-              <a href="#overview" onClick={() => setIsMenuOpen(false)} className="hover:text-gold py-1">Gallery</a>
-              <a href="#configurations" onClick={() => setIsMenuOpen(false)} className="hover:text-gold py-1">Price List</a>
-              <a href="#floor-plans" onClick={() => setIsMenuOpen(false)} className="hover:text-gold py-1">Floor Plan</a>
-              <a href="#connectivity" onClick={() => setIsMenuOpen(false)} className="hover:text-gold py-1">Location</a>
+          <div className="absolute top-full left-0 right-0 bg-[#0a0e1a]/95 backdrop-blur-md py-6 px-4 lg:hidden">
+            <nav className="flex flex-col gap-3 text-[11px] uppercase tracking-[0.2em] font-bold text-[#f5f0e8]/70">
+              <a href="#overview" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Overview</a>
+              <a href="#amenities" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Amenities</a>
+              <a href="#floor-plans" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Floor Plans</a>
+              <a href="#configurations" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Pricing</a>
+              <a href="#connectivity" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Location</a>
             </nav>
-            <div className="h-px bg-white/10 my-2"></div>
-            <div className="flex flex-col gap-3">
-              <a 
-                href="tel:+919920511119" 
-                className="flex items-center gap-3 text-white py-2 text-sm font-semibold justify-center bg-white/5 border border-white/10 rounded-sm"
-              >
-                <Phone size={16} className="text-gold" />
-                <span>Call Now: +91 99205 11119</span>
-              </a>
-            </div>
           </div>
         )}
       </header>
 
-      {/* Redesigned Hero: Full Viewport, Full Bleed Building Background with Dark Overlay */}
-      <section
-      id="hero"
-      className="relative pt-20 pb-4 lg:min-h-screen lg:pt-0 lg:pb-0 flex flex-col lg:flex-row items-center justify-start lg:justify-center bg-[#0a1128] bg-cover bg-center overflow-hidden z-10"
-      style={isMobile ? {} : { backgroundImage: "url('/images/hero_sec_bg.png')", backgroundPosition: "center", backgroundSize: "cover" }}
-      >
-      {/* Dark overlay: rgba(15, 20, 40, 0.65) */}
-      <div className="absolute inset-0 bg-[#0f1428]/65 z-[2]"></div>
+      {/* ═══════ HERO SECTION ═══════ */}
+      <section ref={heroRef} id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-28 sm:py-32">
+        {/* Background — landscape wide render for both mobile and desktop */}
+        <Image
+          src="/renders/3000/ijm-harmony-evening-to-ni8.jpg"
+          alt="IJM Harmony — Evening Panoramic View"
+          fill
+          priority
+          className="object-cover object-center transform-gpu"
+          sizes="100vw"
+          quality={80}
+        />
+        {/* Dark gradient overlay — lighter at top (nav area), darker below for text */}
+        <div className="absolute inset-0 z-[1]" style={{
+          background: "linear-gradient(180deg, rgba(4,6,14,0.25) 0%, rgba(4,6,14,0.35) 12%, rgba(4,6,14,0.5) 30%, rgba(4,6,14,0.55) 45%, rgba(4,6,14,0.45) 60%, rgba(6,8,14,0.55) 80%, rgba(6,8,14,0.75) 100%)"
+        }}></div>
 
-      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-2 lg:py-24 z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+        {/* Hero Content */}
+        <div ref={heroTextRef} className="relative z-[3] w-full max-w-5xl mx-auto px-5 text-center flex flex-col items-center">
 
-      {/* Left Column: Over the image content (Aligned self-end/bottom-left on desktop) */}
-      <div className="lg:col-span-5 text-center lg:text-left space-y-4 lg:space-y-6 z-[3] text-white flex flex-col items-center lg:items-start w-full">
-        <div className="space-y-1">
-          <ShinyText 
-            text="MIHAN, Nagpur" 
-            className="text-[#C9A227] font-bold text-[10px] sm:text-xs uppercase tracking-widest block"
-            color="#C9A227" 
-            shineColor="#ffffff" 
-            speed={3} 
-          />
-          <BlurText 
-            text="IJM FIRST CITY" 
-            className="text-3xl sm:text-5xl lg:text-[52px] font-black tracking-tight leading-none uppercase text-white justify-center lg:justify-start" 
-            delay={100} 
-            animateBy="words" 
-            direction="bottom" 
-          />
-          <div className="text-lg sm:text-2xl lg:text-[24px] font-bold text-white/95">
-            <DecryptedText 
-              text="2, 2.5 & 3 BHK Apartments" 
-              animateOn="hover" 
-              speed={40} 
-              className="text-lg sm:text-2xl lg:text-[24px] font-bold text-white/95" 
-            />
-          </div>
-        </div>
-
-        {/* Specifications list: horizontal row on mobile, vertical stack on desktop */}
-        <div className="flex flex-wrap lg:flex-col gap-x-4 gap-y-2 pt-1 lg:pt-2 lg:space-y-3 text-xs sm:text-base text-white/90 font-medium justify-center lg:justify-start">
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            <MapPin size={14} className="text-[#C9A227] shrink-0" />
-            <span>MIHAN, Nagpur</span>
-          </div>
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            <Maximize2 size={14} className="text-[#C9A227] shrink-0" />
-            <span>Carpet Area: 647 - 1,330 Sq.Ft.*</span>
-          </div>
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            <Building size={14} className="text-[#C9A227] shrink-0" />
-            <span>Status: Under Construction</span>
-          </div>
-        </div>
-
-        {/* Gold CTA button and payment plan */}
-        <div className="space-y-2 pt-2 lg:pt-4 flex flex-col items-center lg:items-start w-full">
-          <button
-            onClick={() => openEnquiryModal("Request Pricing Details", "2.5 BHK")}
-            className="inline-block bg-[#C9A227] hover:bg-gold-light text-[#1a2744] font-black px-5 py-2.5 sm:px-8 sm:py-3.5 rounded-full shadow-lg transition-all duration-300 text-[11px] sm:text-sm tracking-wider uppercase"
-          >
-            Starting Price: ₹73 Lakhs* Onwards
-          </button>
-          <p className="text-[11px] sm:text-sm text-white/80 font-semibold tracking-wide pl-0 lg:pl-3">
-            Payment Plan — Flexi Pay
+          {/* Eyebrow */}
+          <p className="mb-4 text-[#C29B57] text-[10px] sm:text-[11px] font-sans font-semibold uppercase tracking-[0.35em]" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.5)" }}>
+            IJM FIRST CITY — MIHAN, NAGPUR
           </p>
-        </div>
 
-        {/* Mobile-only building render image */}
-        <div className="w-full mt-6 block lg:hidden z-[3] px-2 max-w-sm">
-          <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl">
-            <Image 
-              src="/images/hero-img-m.png" 
-              alt="IJM First City Building Render" 
-              width={400} 
-              height={500} 
-              className="w-full h-auto object-cover" 
-              priority
-            />
-            {/* Soft gradient bottom overlay to blend image into bg */}
-            <div className="absolute inset-x-0 bottom-0 h-1/5 bg-gradient-to-t from-[#0a1128] to-transparent"></div>
+          {/* Main Headline (promoted tagline) */}
+          <h1
+            className="font-serif text-[40px] sm:text-[56px] lg:text-[76px] font-light leading-[1.1] tracking-wide text-white max-w-3xl"
+            style={{ textShadow: "0 2px 20px rgba(0,0,0,0.6), 0 4px 40px rgba(0,0,0,0.4)" }}
+          >
+            Welcome to the world of infinite possibilities
+          </h1>
+
+          {/* Descriptor */}
+          <p className="mt-4 text-[#f5f0e8]/50 font-sans text-[11px] sm:text-xs tracking-[0.2em] uppercase" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.5)" }}>
+            Premium 2, 2.5 & 3 BHK Apartments
+          </p>
+
+          {/* ── Stat Cards Row ── */}
+          <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-lg sm:max-w-2xl">
+            {[
+              { num: "6", label: "Towers" },
+              { num: "15", label: "Storeys" },
+              { num: "690+", label: "Units" },
+              { num: "100+", label: "Amenities" },
+            ].map((stat) => (
+              <div key={stat.label} className="bg-[#0a0e1a]/80 backdrop-blur-sm border border-[#C29B57]/25 rounded-lg px-3 py-4 text-center">
+                <span className="block text-2xl sm:text-3xl font-sans font-bold text-[#C29B57]">{stat.num}</span>
+                <span className="block text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-[#f5f0e8]/60 mt-1">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* ── CTA Row ── */}
+          <div ref={heroCtaRef} className="mt-8 flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+            <Magnet>
+              <button
+                onClick={() => openEnquiryModal("Book a Private Tour", "2.5 BHK")}
+                className="pill-btn pill-btn-gold text-sm px-9 py-3.5"
+              >
+                Book a Tour
+              </button>
+            </Magnet>
+            <Magnet>
+              <a
+                href="#overview"
+                className="pill-btn pill-btn-outline text-sm px-9 py-3.5"
+              >
+                Explore Project
+              </a>
+            </Magnet>
           </div>
         </div>
+      </section>
+
+      {/* ═══════ CONFIGURATIONS & PRICING (New section) ═══════ */}
+      <section className="py-14 sm:py-16 bg-[#151515]">
+        <div className="max-w-4xl mx-auto px-5 text-center">
+          <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">Starting Prices</span>
+          <h2 className="text-2xl sm:text-3xl font-serif font-light text-white mb-8">Configurations & Pricing</h2>
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+            <span className="px-5 py-3 rounded-full border border-[#C29B57]/30 bg-[#0a0e1a]/70 backdrop-blur-sm text-[#C29B57] text-[11px] sm:text-sm font-sans font-semibold tracking-wide">2 BHK · ₹73L</span>
+            <span className="px-5 py-3 rounded-full border border-[#C29B57]/30 bg-[#0a0e1a]/70 backdrop-blur-sm text-[#C29B57] text-[11px] sm:text-sm font-sans font-semibold tracking-wide">2.5 BHK · ₹87L</span>
+            <span className="px-5 py-3 rounded-full border border-[#C29B57]/30 bg-[#0a0e1a]/70 backdrop-blur-sm text-[#C29B57] text-[11px] sm:text-sm font-sans font-semibold tracking-wide">3 BHK · ₹1.17Cr</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ WHAT WE OFFER — ASYMMETRIC GRID (Landscape renders) ═══════ */}
+      <section id="overview" className="py-20 sm:py-28 bg-[#FAF9F6] relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="gsap-fade-up text-center mb-14">
+            <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
+              <ShinyText text="WHAT WE OFFER" color="#C29B57" shineColor="#f5f0e8" speed={3} />
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light text-[#1A1A1A]">
+              <BlurText text="Sanctuary of Modern Luxury" delay={80} animateBy="words" direction="bottom" />
+            </h2>
+            <div className="h-px bg-[#C29B57] w-16 mx-auto mt-4"></div>
+          </div>
+
+          <div className="stagger-container asym-grid">
+            {/* Featured large card — aerial 3000px */}
+            <div className="stagger-item card-featured luxury-card rounded-xl overflow-hidden relative group">
+              <Image src={RENDERS.aerial} alt="Aerial View of IJM Harmony Township" fill className="object-cover" sizes="(max-width:768px) 100vw, 66vw" loading="lazy" quality={60} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/90 via-[#0a0808]/30 to-transparent z-[1]"></div>
+              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 z-[2]">
+                <Trees size={24} className="text-[#b8924a] mb-2" />
+                <h3 className="text-lg sm:text-xl font-serif font-bold text-white mb-1">31 Acres Gated Paradise</h3>
+                <p className="text-[#f5f0e8]/50 text-xs max-w-sm">Premium integrated township with resort-style landscaping</p>
+              </div>
+            </div>
+
+            {/* Smaller cards using landscape renders */}
+            <div className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.fountain} alt="Water Fountain Area" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/80 to-transparent z-[1] flex items-end p-4">
+                <div>
+                  <Building size={18} className="text-[#b8924a] mb-1" />
+                  <h3 className="text-sm font-serif font-bold text-white">6 Grand Towers</h3>
+                  <p className="text-[#f5f0e8]/40 text-[10px]">RCC shear wall technology</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.peace} alt="Peace Park" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/80 to-transparent z-[1] flex items-end p-4">
+                <div>
+                  <Award size={18} className="text-[#b8924a] mb-1" />
+                  <h3 className="text-sm font-serif font-bold text-white">100+ Amenities</h3>
+                  <p className="text-[#f5f0e8]/40 text-[10px]">Indoor & outdoor resort living</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.walking} alt="Walking Park" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/80 to-transparent z-[1] flex items-end p-4">
+                <div>
+                  <Compass size={18} className="text-[#b8924a] mb-1" />
+                  <h3 className="text-sm font-serif font-bold text-white">3-Side Open</h3>
+                  <p className="text-[#f5f0e8]/40 text-[10px]">Natural ventilation & sunlight</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.bedroom} alt="Premium Bedroom Interior" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/80 to-transparent z-[1] flex items-end p-4">
+                <div>
+                  <Maximize2 size={18} className="text-[#b8924a] mb-1" />
+                  <h3 className="text-sm font-serif font-bold text-white">Smart Layouts</h3>
+                  <p className="text-[#f5f0e8]/40 text-[10px]">Zero-wastage carpet area</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.entrance} alt="Grand Entrance" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/80 to-transparent z-[1] flex items-end p-4">
+                <div>
+                  <Shield size={18} className="text-[#b8924a] mb-1" />
+                  <h3 className="text-sm font-serif font-bold text-white">High ROI</h3>
+                  <p className="text-[#f5f0e8]/40 text-[10px]">MIHAN IT hub location</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.balcony} alt="Premium Balcony" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/80 to-transparent z-[1] flex items-end p-4">
+                <div>
+                  <Star size={18} className="text-[#b8924a] mb-1" />
+                  <h3 className="text-sm font-serif font-bold text-white">Premium Finish</h3>
+                  <p className="text-[#f5f0e8]/40 text-[10px]">Branded fittings & flooring</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ LEAD CAPTURE FORM (Elevated Glassmorphism) ═══════ */}
+      <section className="py-16 sm:py-20 bg-[#151515] relative">
+        <div className="max-w-md mx-auto px-4">
+          <div className="gsap-fade-up glass-gold rounded-2xl p-8 sm:p-10 neu-shadow">
+            <div className="text-center mb-8">
+              <span className="text-[#b8924a] font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">Get Exclusive Pricing</span>
+              <h3 className="text-2xl sm:text-3xl font-serif font-light text-white">Enquire Now</h3>
+              <p className="text-[#f5f0e8]/50 text-xs mt-2">Our team will call back within 15 minutes</p>
+            </div>
+            <form onSubmit={handleVisitSubmit} className="space-y-4">
+              <div>
+                <input type="text" required value={visitForm.name} onChange={(e) => setVisitForm({ ...visitForm, name: e.target.value })} placeholder="Full Name" className={`form-input ${errors.name ? "!border-red-500" : ""}`} />
+                {errors.name && <p className="text-red-400 text-[10px] mt-1">{errors.name}</p>}
+              </div>
+              <div>
+                <input type="tel" required value={visitForm.phone} onChange={(e) => setVisitForm({ ...visitForm, phone: e.target.value })} placeholder="Phone Number" className={`form-input ${errors.phone ? "!border-red-500" : ""}`} />
+                {errors.phone && <p className="text-red-400 text-[10px] mt-1">{errors.phone}</p>}
+              </div>
+              <div>
+                <input type="email" required value={visitForm.email} onChange={(e) => setVisitForm({ ...visitForm, email: e.target.value })} placeholder="Email Address" className={`form-input ${errors.email ? "!border-red-500" : ""}`} />
+                {errors.email && <p className="text-red-400 text-[10px] mt-1">{errors.email}</p>}
+              </div>
+              <select value={visitForm.config} onChange={(e) => setVisitForm({ ...visitForm, config: e.target.value })} className="form-input">
+                <option value="2 BHK">2 BHK</option>
+                <option value="2.5 BHK">2.5 BHK</option>
+                <option value="3 BHK">3 BHK</option>
+              </select>
+              <div className="text-center"><Magnet>
+                <button type="submit" className="pill-btn pill-btn-gold py-3 px-12">Get Pricing Sheet</button>
+              </Magnet></div>
+              <p className="text-[9px] text-[#f5f0e8]/30 text-center">I authorize NITPL to contact me, overriding DNC/NDNC.</p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ RECOMMENDED PROPERTIES — ASYMMETRIC GRID (Landscape renders) ═══════ */}
+      <section id="amenities" className="py-20 sm:py-28 bg-[#151515] relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="gsap-fade-up text-center mb-14">
+            <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
+              <ShinyText text="RESORT LIVING" color="#C29B57" shineColor="#f5f0e8" speed={3} />
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-light text-white">
+              <BlurText text="World-Class Amenities" delay={80} animateBy="words" direction="bottom" />
+            </h2>
+            <div className="h-px bg-[#C29B57] w-16 mx-auto mt-4"></div>
+          </div>
+
+          <div className="stagger-container asym-grid">
+            {/* Featured — large card */}
+            <GlareHover className="stagger-item card-featured luxury-card rounded-xl overflow-hidden relative group">
+              <Image src={RENDERS.chitChat} alt="Chit Chat Park" fill className="object-cover" sizes="(max-width:768px) 100vw, 66vw" loading="lazy" quality={60} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-6">
+                <span className="text-white font-serif text-lg font-bold">Chit-Chat Park</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.gym} alt="Outdoor Gym" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Outdoor Gym</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.cricket} alt="Box Cricket Pitch" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Box Cricket Pitch</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.multiSport} alt="Multi-Sport Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Multi-Sport Court</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.miyawaki} alt="Miyawaki Forest" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Miyawaki Forest</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.library} alt="Outdoor Library" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Outdoor Library</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src={RENDERS.childPlay} alt="Children Play Area" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Kids Play Area</span>
+              </div>
+            </GlareHover>
+          </div>
+
+          <div className="gsap-fade-up mt-12 text-center">
+            <Magnet>
+              <button onClick={() => openEnquiryModal("Request full amenity list", "2.5 BHK")} className="pill-btn pill-btn-outline">View All 100+ Amenities</button>
+            </Magnet>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ INTERIOR HIGHLIGHTS (3000px Interior renders) ═══════ */}
+      <section className="py-20 sm:py-28 bg-[#FAF9F6] relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="gsap-fade-up text-center mb-14">
+            <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
+              <ShinyText text="INTERIORS" color="#C29B57" shineColor="#1A1A1A" speed={3} />
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-light text-[#1A1A1A]">
+              <BlurText text="Crafted Interiors" delay={80} animateBy="words" direction="bottom" />
+            </h2>
+            <div className="h-px bg-[#C29B57] w-16 mx-auto mt-4"></div>
+          </div>
+
+          <div className="stagger-container grid grid-cols-1 md:grid-cols-2 gap-6">
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[280px] sm:h-[380px]">
+              <Image src="/renders/interiors/dining-area.jpg" alt="Elegant Dining Area" fill className="object-cover object-center" sizes="(max-width:768px) 100vw, 50vw" loading="lazy" quality={60} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/80 to-transparent z-[1] flex items-end p-6">
+                <div>
+                  <h3 className="text-lg font-serif font-bold text-white">Dining Area</h3>
+                  <p className="text-[#f5f0e8]/50 text-xs mt-1">Elegant spaces crafted for every gathering</p>
+                </div>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[280px] sm:h-[380px]">
+              <Image src={RENDERS.balcony} alt="Premium Balcony View" fill className="object-cover" sizes="(max-width:768px) 100vw, 50vw" loading="lazy" quality={60} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/80 to-transparent z-[1] flex items-end p-6">
+                <div>
+                  <h3 className="text-lg font-serif font-bold text-white">Private Balcony</h3>
+                  <p className="text-[#f5f0e8]/50 text-xs mt-1">Panoramic green views from every unit</p>
+                </div>
+              </div>
+            </GlareHover>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ PRICING SECTION ═══════ */}
+      <section id="configurations" className="py-20 sm:py-28 bg-[#151515] relative">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="gsap-fade-up text-center mb-14">
+            <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
+              <ShinyText text="PRICING & PLANS" color="#C29B57" shineColor="#f5f0e8" speed={3} />
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-light text-white">
+              <BlurText text="Apartment Configurations" delay={80} animateBy="words" direction="bottom" />
+            </h2>
+            <div className="h-px bg-[#C29B57] w-16 mx-auto mt-4"></div>
+          </div>
+
+          {/* Pill tab selector */}
+          <div className="gsap-fade-up flex justify-center mb-10">
+            <div className="glass rounded-[50px] p-1.5 flex gap-1">
+              <button onClick={() => setActivePriceTab("2bhk")} className={`pill-btn text-[10px] px-6 py-2 ${activePriceTab === "2bhk" ? "pill-btn-gold" : "pill-btn-outline border-0 text-[#f5f0e8]/60"}`}>2 BHK</button>
+              <button onClick={() => setActivePriceTab("2.5bhk")} className={`pill-btn text-[10px] px-6 py-2 ${activePriceTab === "2.5bhk" ? "pill-btn-gold" : "pill-btn-outline border-0 text-[#f5f0e8]/60"}`}>2.5 BHK</button>
+              <button onClick={() => setActivePriceTab("3bhk")} className={`pill-btn text-[10px] px-6 py-2 ${activePriceTab === "3bhk" ? "pill-btn-gold" : "pill-btn-outline border-0 text-[#f5f0e8]/60"}`}>3 BHK</button>
+            </div>
+          </div>
+
+          <div className="glass rounded-2xl p-8 sm:p-10 neu-shadow">
+            {activePriceTab === "2bhk" && (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-white/5">
+                  <h3 className="text-xl font-serif font-bold text-white">2 BHK Spacious</h3>
+                  <span className="pill-btn pill-btn-gold text-xs py-2 px-5">Starting ₹73 Lakhs*</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-[#f5f0e8]/70">
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>Carpet Area: 849–912 Sq.Ft.</div>
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>3-Side Open Ventilation</div>
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>2 Modern Bathrooms</div>
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>1 Utility Balcony</div>
+                </div>
+                <Magnet><button onClick={() => openEnquiryModal("2 BHK Pricing", "2 BHK")} className="pill-btn pill-btn-outline w-full sm:w-auto mt-4">Get Cost Sheet</button></Magnet>
+              </div>
+            )}
+            {activePriceTab === "2.5bhk" && (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-white/5">
+                  <h3 className="text-xl font-serif font-bold text-white">2.5 BHK Utility</h3>
+                  <span className="pill-btn pill-btn-gold text-xs py-2 px-5">Starting ₹87 Lakhs*</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-[#f5f0e8]/70">
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>Carpet Area: 1050–1115 Sq.Ft.</div>
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>Dedicated Study Room</div>
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>2 Standing Balconies</div>
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>Modular Layout Options</div>
+                </div>
+                <Magnet><button onClick={() => openEnquiryModal("2.5 BHK Pricing", "2.5 BHK")} className="pill-btn pill-btn-outline w-full sm:w-auto mt-4">Get Cost Sheet</button></Magnet>
+              </div>
+            )}
+            {activePriceTab === "3bhk" && (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-white/5">
+                  <h3 className="text-xl font-serif font-bold text-white">3 BHK Luxury</h3>
+                  <span className="pill-btn pill-btn-gold text-xs py-2 px-5">Starting ₹1.17 Crore*</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-[#f5f0e8]/70">
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>Carpet Area: 1250–1417 Sq.Ft.</div>
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>3 Bedrooms & 3 Balconies</div>
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>Grand Foyer Entrance</div>
+                  <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-[#b8924a]"></span>Corner Ventilation Layout</div>
+                </div>
+                <Magnet><button onClick={() => openEnquiryModal("3 BHK Pricing", "3 BHK")} className="pill-btn pill-btn-outline w-full sm:w-auto mt-4">Get Cost Sheet</button></Magnet>
+              </div>
+            )}
+          </div>
+          <p className="gsap-fade-up text-[10px] text-[#f5f0e8]/30 italic text-center mt-6">*BSP only. Excludes statutory charges, parking, amenities & GST.</p>
+        </div>
+      </section>
+
+      {/* ═══════ FLOOR PLANS ═══════ */}
+      <section id="floor-plans" className="py-20 sm:py-28 bg-[#FAF9F6] relative">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="gsap-fade-up text-center mb-14">
+            <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
+              <ShinyText text="FLOOR LAYOUTS" color="#C29B57" shineColor="#1A1A1A" speed={3} />
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-light text-[#1A1A1A]">
+              <BlurText text="Typical Floor Plans" delay={80} animateBy="words" direction="bottom" />
+            </h2>
+            <div className="h-px bg-[#C29B57] w-16 mx-auto mt-4"></div>
+          </div>
+
+          <div className="gsap-fade-up flex justify-center mb-10">
+            <div className="glass rounded-[50px] p-1.5 flex gap-1">
+              <button onClick={() => setActiveFloorTab("2bhk")} className={`pill-btn text-[10px] px-6 py-2 ${activeFloorTab === "2bhk" ? "pill-btn-gold" : "pill-btn-outline border-0 text-[#3a3a3a]/60"}`}>2 BHK</button>
+              <button onClick={() => setActiveFloorTab("2.5bhk")} className={`pill-btn text-[10px] px-6 py-2 ${activeFloorTab === "2.5bhk" ? "pill-btn-gold" : "pill-btn-outline border-0 text-[#3a3a3a]/60"}`}>2.5 BHK</button>
+              <button onClick={() => setActiveFloorTab("3bhk")} className={`pill-btn text-[10px] px-6 py-2 ${activeFloorTab === "3bhk" ? "pill-btn-gold" : "pill-btn-outline border-0 text-[#3a3a3a]/60"}`}>3 BHK</button>
+            </div>
+          </div>
+
+          <div className="bg-white/80 backdrop-blur-sm border border-[#C29B57]/15 rounded-2xl p-6 sm:p-10 shadow-lg flex flex-col lg:flex-row gap-10 items-center">
+            {activeFloorTab === "2bhk" && (
+              <>
+                <div className="lg:w-1/2 space-y-5 text-left">
+                  <h3 className="text-xl font-serif font-bold text-[#1A1A1A]">2 BHK Layout</h3>
+                  <ul className="space-y-3 text-sm text-[#3a3a3a]">
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>Carpet: 849–912 Sq.ft.</li>
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>2 Modern Bathrooms</li>
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>1 Utility Balcony</li>
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>3-Side Open Ventilation</li>
+                  </ul>
+                  <Magnet><button onClick={() => openEnquiryModal("2 BHK Floor Plan", "2 BHK")} className="pill-btn pill-btn-outline mt-4">Enquire Now</button></Magnet>
+                </div>
+                <div className="lg:w-1/2 relative w-full h-60 sm:h-[380px] bg-[#f0eeeb] rounded-xl border border-[#C29B57]/10 overflow-hidden">
+                  <Image src="/images/Typical-Floor-Plan.png" alt="2 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
+                </div>
+              </>
+            )}
+            {activeFloorTab === "2.5bhk" && (
+              <>
+                <div className="lg:w-1/2 space-y-5 text-left">
+                  <h3 className="text-xl font-serif font-bold text-[#1A1A1A]">2.5 BHK Layout</h3>
+                  <ul className="space-y-3 text-sm text-[#3a3a3a]">
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>Carpet: 1050–1115 Sq.ft.</li>
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>2 Bathrooms + Study</li>
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>2 Standing Balconies</li>
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>Modular Customization</li>
+                  </ul>
+                  <Magnet><button onClick={() => openEnquiryModal("2.5 BHK Floor Plan", "2.5 BHK")} className="pill-btn pill-btn-outline mt-4">Enquire Now</button></Magnet>
+                </div>
+                <div className="lg:w-1/2 relative w-full h-60 sm:h-[380px] bg-[#f0eeeb] rounded-xl border border-[#C29B57]/10 overflow-hidden">
+                  <Image src="/images/Floor-Plan.png" alt="2.5 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
+                </div>
+              </>
+            )}
+            {activeFloorTab === "3bhk" && (
+              <>
+                <div className="lg:w-1/2 space-y-5 text-left">
+                  <h3 className="text-xl font-serif font-bold text-[#1A1A1A]">3 BHK Layout</h3>
+                  <ul className="space-y-3 text-sm text-[#3a3a3a]">
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>Carpet: 1250–1417 Sq.ft.</li>
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>3 Grand Bathrooms</li>
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>3 Large Balconies</li>
+                    <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#C29B57]"></span>Corner Ventilation</li>
+                  </ul>
+                  <Magnet><button onClick={() => openEnquiryModal("3 BHK Floor Plan", "3 BHK")} className="pill-btn pill-btn-outline mt-4">Enquire Now</button></Magnet>
+                </div>
+                <div className="lg:w-1/2 relative w-full h-60 sm:h-[380px] bg-[#f0eeeb] rounded-xl border border-[#C29B57]/10 overflow-hidden">
+                  <Image src="/images/Harmony6.png" alt="3 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ CONNECTIVITY & LOCATION ═══════ */}
+      <section id="connectivity" className="py-20 sm:py-28 bg-[#151515] relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="gsap-fade-up text-center mb-14">
+            <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
+              <ShinyText text="LOCATION ADVANTAGE" color="#C29B57" shineColor="#f5f0e8" speed={3} />
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-light text-white">
+              <BlurText text="Landmarks & Connectivity" delay={80} animateBy="words" direction="bottom" />
+            </h2>
+            <div className="h-px bg-[#C29B57] w-16 mx-auto mt-4"></div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="gsap-fade-up lg:col-span-5 space-y-5">
+              <h3 className="text-xl font-serif text-white mb-6">From First City</h3>
+              <div className="space-y-0 divide-y divide-white/5">
+                {[
+                  { name: "Infosys", dist: "3 Mins" },
+                  { name: "AIIMS", dist: "5 Mins" },
+                  { name: "TCS", dist: "7 Mins" },
+                  { name: "Nagpur Intl Airport", dist: "12 Mins" },
+                  { name: "Nagpur Railway Stn", dist: "20 Mins" },
+                ].map((item) => (
+                  <div key={item.name} className="py-3.5 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#b8924a]"></span>
+                      <span className="text-sm text-[#f5f0e8]/80">{item.name}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-[#b8924a] bg-[#b8924a]/10 border border-[#b8924a]/20 px-3 py-1 rounded-full">{item.dist}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="gsap-fade-up lg:col-span-7 glass rounded-2xl p-3 neu-shadow-sm">
+              <div className="relative w-full h-[300px] sm:h-[400px] overflow-hidden rounded-xl bg-black/30" style={{ filter: "invert(90%) hue-rotate(180deg) brightness(85%) contrast(90%)" }}>
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.690397621467!2d79.03568347503189!3d21.04507048060831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd4bf55d2d8642b%3A0xcf8f6266e9755bf!2sFirst%20City!5e0!3m2!1sen!2sin!4v1761571621443!5m2!1sen!2sin"
+                  width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+              <div className="p-3 text-center">
+                <a href="https://maps.app.goo.gl/cf8f6266e9755bf" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[#b8924a] text-xs uppercase tracking-[0.15em] font-bold hover:text-white transition-colors">
+                  <MapPin size={14} /> Open In Google Maps
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ ABOUT & TESTIMONIALS ═══════ */}
+      <section className="py-20 sm:py-28 bg-[#FAF9F6] relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="gsap-fade-up grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
+            <div className="space-y-6 text-left">
+              <div className="flex items-center gap-2 text-[#C29B57] text-xs uppercase tracking-[0.2em] font-bold">
+                <Award size={16} />
+                <ShinyText text="BRAND HERITAGE" color="#C29B57" shineColor="#1A1A1A" speed={3} />
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-serif font-light text-[#1A1A1A]">About IJM Group</h2>
+              <div className="w-16 h-px bg-[#C29B57]"></div>
+              <p className="text-[#3a3a3a] text-sm leading-relaxed">NITPL delivers global engineering standards to Central India — high-quality residential spaces with a zero-delay delivery record.</p>
+              <div className="grid grid-cols-2 gap-6 pt-6 border-t border-[#1A1A1A]/10">
+                <div>
+                  <span className="text-3xl font-serif font-bold text-[#C29B57]"><CountUp to={35} from={0} suffix="+" /></span>
+                  <span className="block text-[9px] uppercase tracking-[0.2em] text-[#3a3a3a]/60 mt-1">Years in India</span>
+                </div>
+                <div>
+                  <span className="text-3xl font-serif font-bold text-[#C29B57]"><CountUp to={200} from={0} suffix="M+" /></span>
+                  <span className="block text-[9px] uppercase tracking-[0.2em] text-[#3a3a3a]/60 mt-1">Sq.Ft. Delivered</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white/80 backdrop-blur-sm border border-[#C29B57]/15 rounded-2xl p-8 space-y-5 shadow-lg">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-10 bg-[#FAF9F6] p-2 rounded-lg flex items-center justify-center border border-[#C29B57]/20">
+                  <Image src="/images/ijm_logo.png" alt="IJM Logo" width={56} height={40} className="object-contain" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#1A1A1A]">Nagpur Integrated Township Pvt. Ltd.</h4>
+                  <p className="text-[10px] text-[#3a3a3a]/60 uppercase tracking-wider">A SPV of IJM Group</p>
+                </div>
+              </div>
+              <p className="text-[#3a3a3a] text-xs leading-relaxed">Decades of engineering precision and zero-delay delivery make IJM First City one of the safest property investments in Central India.</p>
+            </div>
+          </div>
+
+          {/* Testimonials */}
+          <div className="gsap-fade-up text-center mb-12">
+            <h3 className="text-2xl font-serif font-light text-[#1A1A1A]">What Buyers Say</h3>
+            <div className="h-px bg-[#C29B57] w-12 mx-auto mt-3"></div>
+          </div>
+          <div className="stagger-container grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { quote: "Construction quality is top-notch, gated security makes it feel safe.", name: "Anil Deshmukh", role: "IT Consultant, Infosys" },
+              { quote: "Excellent 3-side ventilation and proximity to AIIMS and the airport.", name: "Priya Kulkarni", role: "Doctor, AIIMS Nagpur" },
+              { quote: "Unmatched developer credibility with strict possession timelines.", name: "Ramesh Jha", role: "Investor, Mumbai" },
+            ].map((t) => (
+              <GlareHover key={t.name} className="stagger-item bg-white/80 backdrop-blur-sm border border-[#C29B57]/15 rounded-xl p-6 sm:p-8 text-left shadow-md">
+                <div className="flex gap-0.5 text-[#C29B57] mb-4">
+                  {[...Array(5)].map((_, i) => <Star key={i} size={13} fill="#C29B57" stroke="none" />)}
+                </div>
+                <p className="text-[#3a3a3a] text-xs sm:text-sm italic mb-5">&ldquo;{t.quote}&rdquo;</p>
+                <h4 className="text-sm font-bold text-[#1A1A1A]">{t.name}</h4>
+                <p className="text-[9px] text-[#3a3a3a]/60 uppercase tracking-wider mt-0.5">{t.role}</p>
+              </GlareHover>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ BOOK SITE VISIT ═══════ */}
+      <section className="py-20 sm:py-28 bg-[#151515] relative">
+        <div className="max-w-md mx-auto px-4 sm:px-6">
+          <div className="gsap-fade-up glass rounded-2xl overflow-hidden neu-shadow p-8">
+            <div className="space-y-4 text-center mb-8">
+              <span className="text-[#b8924a] font-bold text-[10px] uppercase tracking-[0.3em]">By Appointment</span>
+              <h3 className="text-2xl font-serif font-light text-white">Book Site Visit</h3>
+              <div className="w-12 h-px bg-[#b8924a] mx-auto"></div>
+              <p className="text-[#f5f0e8]/50 text-xs leading-relaxed">Schedule a private tour of MIHAN location.</p>
+            </div>
+            <form onSubmit={handleVisitSubmit} className="space-y-4">
+              <input type="text" required value={visitForm.name} onChange={(e) => setVisitForm({...visitForm, name: e.target.value})} placeholder="Full Name" className={`form-input ${errors.name ? "!border-red-500" : ""}`} />
+              <input type="tel" required value={visitForm.phone} onChange={(e) => setVisitForm({...visitForm, phone: e.target.value})} placeholder="Phone Number" className={`form-input ${errors.phone ? "!border-red-500" : ""}`} />
+              <input type="email" required value={visitForm.email} onChange={(e) => setVisitForm({...visitForm, email: e.target.value})} placeholder="Email Address" className={`form-input ${errors.email ? "!border-red-500" : ""}`} />
+              <select value={visitForm.config} onChange={(e) => setVisitForm({...visitForm, config: e.target.value})} className="form-input">
+                <option value="2 BHK">2 BHK</option>
+                <option value="2.5 BHK">2.5 BHK</option>
+                <option value="3 BHK">3 BHK</option>
+              </select>
+              <div className="text-center"><Magnet><button type="submit" className="pill-btn pill-btn-gold py-3.5 px-12 text-xs">Book Free Site Visit</button></Magnet></div>
+              <p className="text-[9px] text-[#f5f0e8]/30 text-center">I authorize NITPL to contact me, overriding DNC/NDNC.</p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ FOOTER ═══════ */}
+      <footer className="bg-[#121212] pt-16 pb-32 border-t border-[#C29B57]/10 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pb-12 border-b border-white/5">
+            <div className="space-y-4">
+              <Image src="/images/footer-logo.png" alt="IJM Logo" width={72} height={40} className="object-contain" />
+              <p className="text-[#f5f0e8]/40 text-xs leading-relaxed max-w-xs">IJM First City, Sector-20, MIHAN, Nagpur, Maharashtra</p>
+            </div>
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-[#b8924a] uppercase tracking-[0.2em]">Quick Links</h4>
+              <nav className="flex flex-col gap-2 text-xs text-[#f5f0e8]/50">
+                <a href="#hero" className="hover:text-[#b8924a] transition-colors">Home</a>
+                <a href="#overview" className="hover:text-[#b8924a] transition-colors">Overview</a>
+                <a href="#amenities" className="hover:text-[#b8924a] transition-colors">Amenities</a>
+                <a href="#configurations" className="hover:text-[#b8924a] transition-colors">Pricing</a>
+              </nav>
+            </div>
+            <div className="space-y-3 text-xs text-[#f5f0e8]/40">
+              <h4 className="text-xs font-bold text-[#b8924a] uppercase tracking-[0.2em]">Legal</h4>
+              <p>MahaRERA: P50500049468 | P50500080409</p>
+              <a href="tel:+919920511119" className="flex items-center gap-2 text-[#b8924a] hover:text-white transition-colors mt-3"><Phone size={14} /> +91 99205 11119</a>
+            </div>
+          </div>
+          <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] text-white/30">
+            <p>© 2026 <span className="text-white/60 font-semibold">NITPL</span>. All Rights Reserved.</p>
+            <div className="flex gap-4">
+              <a href="#" className="hover:text-[#b8924a] transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-[#b8924a] transition-colors">Terms of Use</a>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-white/30">
+            <span>Powered by OG</span>
+            <img src="https://www.letsoutgrow.com/oglogo.png" alt="OG Logo" className="h-[20px] inline-block" />
+          </div>
+        </div>
+      </footer>
+
+      {/* ═══════ FLOATING CALL & WHATSAPP BUTTONS ═══════ */}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
+        <a href="https://wa.me/919920511119" target="_blank" rel="noopener noreferrer" className="w-14 h-14 bg-[#25D366] hover:bg-[#20ba5a] text-white flex items-center justify-center rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:scale-110 transition-all duration-200" aria-label="WhatsApp">
+          <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+        <a href="tel:+919920511119" className="w-14 h-14 bg-[#b8924a] hover:bg-[#d4af70] text-[#0a0808] flex items-center justify-center rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:scale-110 transition-all duration-200" aria-label="Call">
+          <Phone size={22} />
+        </a>
       </div>
 
-      {/* Right Column: Building Render Image + Stacked Form Card (hidden on mobile/tablet) */}
-      <div className="hidden lg:flex lg:col-span-7 flex-col w-full z-[3] lg:self-start lg:pt-4 pl-6 space-y-4">
-        <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#0a0f23]/40 backdrop-blur-sm">
-          <Image 
-            src="/images/hero-img-d.png" 
-            alt="IJM First City Building Render" 
-            width={850} 
-            height={550} 
-            className="w-full h-auto object-cover" 
-            priority
-          />
-          {/* Soft gradient edge fade */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a1128]/20 to-transparent"></div>
-        </div>
-
-        {/* Stacked Form Card below the Image */}
-        <div className="w-full max-w-md mx-auto bg-[#0a0f23]/85 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl p-6 text-left">
-          <div className="text-center mb-4">
-            <h3 className="text-xs font-black text-white uppercase tracking-wider">
-              BOOK YOUR NEW HOME
-            </h3>
-            <div className="w-10 h-[2px] bg-gold mx-auto mt-2 rounded-full"></div>
-          </div>
-
-          <form onSubmit={handleHeroSubmit} className="space-y-3.5">
-            <div>
-              <label className="block text-[10px] font-semibold text-white/80 uppercase tracking-wider mb-1">Full Name*</label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-white/40">
-                  <User size={14} />
-                </span>
-                <input
-                  type="text"
-                  required
-                  value={heroForm.name}
-                  onChange={(e) => setHeroForm({...heroForm, name: e.target.value})}
-                  placeholder="John Doe"
-                  className={`w-full pl-9 pr-3 py-2 bg-white/5 border ${errors.name ? 'border-red-500' : 'border-white/10'} rounded-lg focus:outline-none focus:border-gold text-xs text-white`}
-                />
-              </div>
-              {errors.name && <p className="text-red-500 text-[10px] mt-0.5">{errors.name}</p>}
+      {/* ═══════ ENQUIRY MODAL ═══════ */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+          <div className="relative w-full max-w-md rounded-2xl p-6 sm:p-8 border border-[#C29B57]/25 border-t-2 border-t-[#C29B57] bg-[#1a1a1a] shadow-2xl">
+            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-white/50 hover:text-[#C29B57] transition-colors" aria-label="Close"><X size={20} /></button>
+            <div className="text-center mb-6">
+              <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">{modalTitle}</h3>
+              <p className="text-[#f5f0e8]/50 text-xs mt-1">Our team will call back in 15 mins</p>
             </div>
-
-            <div>
-              <label className="block text-[10px] font-semibold text-white/80 uppercase tracking-wider mb-1">Phone Number*</label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-white/50">
-                  <span className="text-xs font-bold font-sans">+91</span>
-                </span>
-                <input
-                  type="tel"
-                  required
-                  value={heroForm.phone}
-                  onChange={(e) => setHeroForm({...heroForm, phone: e.target.value})}
-                  placeholder="Mobile Number"
-                  className={`w-full pl-11 pr-3 py-2 bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-white/10'} rounded-lg focus:outline-none focus:border-gold text-xs text-white`}
-                />
-              </div>
-              {errors.phone && <p className="text-red-500 text-[10px] mt-0.5">{errors.phone}</p>}
-            </div>
-
-            <div>
-              <label className="block text-[10px] font-semibold text-white/80 uppercase tracking-wider mb-1">Email Address*</label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-white/40">
-                  <Mail size={14} />
-                </span>
-                <input
-                  type="email"
-                  required
-                  value={heroForm.email}
-                  onChange={(e) => setHeroForm({...heroForm, email: e.target.value})}
-                  placeholder="name@domain.com"
-                  className={`w-full pl-9 pr-3 py-2 bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-lg focus:outline-none focus:border-gold text-xs text-white`}
-                />
-              </div>
-              {errors.email && <p className="text-red-500 text-[10px] mt-0.5">{errors.email}</p>}
-            </div>
-
-            <div>
-              <label className="block text-[10px] font-semibold text-white/80 uppercase tracking-wider mb-1">Interested BHK*</label>
-              <select
-                value={heroForm.config}
-                onChange={(e) => setHeroForm({...heroForm, config: e.target.value})}
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-gold text-xs text-white [&>option]:text-navy"
-              >
+            <form onSubmit={handleModalSubmit} className="space-y-4">
+              <input type="text" required value={modalForm.name} onChange={(e) => setModalForm({...modalForm, name: e.target.value})} placeholder="Full Name" className={`form-input ${errors.name ? "!border-red-500" : ""}`} />
+              <input type="tel" required value={modalForm.phone} onChange={(e) => setModalForm({...modalForm, phone: e.target.value})} placeholder="Phone Number" className={`form-input ${errors.phone ? "!border-red-500" : ""}`} />
+              <input type="email" required value={modalForm.email} onChange={(e) => setModalForm({...modalForm, email: e.target.value})} placeholder="Email Address" className={`form-input ${errors.email ? "!border-red-500" : ""}`} />
+              <select value={modalForm.config} onChange={(e) => setModalForm({...modalForm, config: e.target.value})} className="form-input">
                 <option value="2 BHK">2 BHK Apartments</option>
                 <option value="2.5 BHK">2.5 BHK Apartments</option>
                 <option value="3 BHK">3 BHK Apartments</option>
               </select>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-[#C9A227] hover:bg-gold-light text-[#1a2744] font-black py-2.5 px-4 rounded-lg transition-all duration-300 shadow-md uppercase tracking-wider text-xs"
-            >
-              Get Best Price
-            </button>
-          </form>
-        </div>
-      </div>
-
-      </div>
-
-      {/* Barcode / RERA display bottom left of Hero */}
-      <div className="absolute bottom-4 left-4 z-10 hidden lg:block">
-      <p className="text-white text-[10px] font-semibold bg-black/40 px-3 py-1.5 rounded backdrop-blur-sm border border-white/5">
-      MahaRERA Reg No: P50500049468 | P50500080409
-      </p>
-      </div>
-      </section>
-
-      {/* Stats Bar: Navy Gradient, Gold text, Sleek compact ribbon, Dividers */}
-      <section className="bg-gradient-to-r from-[#0f1e3d] to-[#1a2744] border-y border-gold/25 py-5 sm:py-6 relative overflow-hidden noise-overlay">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6 lg:gap-6 text-center lg:divide-x divide-gold/20">
-            <div className="py-1 lg:py-0">
-              <span className="block text-2xl sm:text-3xl font-black text-gold leading-none">7.5 ACRES</span>
-              <span className="block text-[10px] uppercase tracking-wider text-gray-300 mt-1.5 font-bold">Project Size</span>
-            </div>
-            <div className="py-1 lg:py-0 lg:pl-4">
-              <span className="block text-2xl sm:text-3xl font-black text-gold leading-none">690 UNITS</span>
-              <span className="block text-[10px] uppercase tracking-wider text-gray-300 mt-1.5 font-bold">Harmony Tower</span>
-            </div>
-            <div className="py-1 lg:py-0 lg:pl-4">
-              <span className="block text-2xl sm:text-3xl font-black text-gold leading-none">DEC 2027</span>
-              <span className="block text-[10px] uppercase tracking-wider text-gray-300 mt-1.5 font-bold">RERA Possession</span>
-            </div>
-            <div className="py-1 lg:py-0 lg:pl-4">
-              <span className="block text-2xl sm:text-3xl font-black text-gold leading-none">₹73L - 1.14CR</span>
-              <span className="block text-[10px] uppercase tracking-wider text-gray-300 mt-1.5 font-bold">Price Range</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Overview Section - White bg */}
-      <section id="overview" className="py-24 sm:py-32 bg-white relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* Section Heading Accent */}
-          <div className="flex flex-col items-center mb-16">
-            <span className="text-[#C9A227] font-bold text-xs uppercase tracking-widest block mb-2">PROJECT OVERVIEW</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black text-navy text-center tracking-tight leading-tight">Welcome to IJM FCP Harmony</h2>
-            <div className="w-12 h-[3px] bg-[#C9A227] mt-4 rounded-full"></div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-            
-            {/* Visual Render Grid */}
-            <div className="lg:col-span-6 grid grid-cols-2 gap-4 relative">
-              <div className="absolute -inset-4 bg-gold/5 rounded-2xl -z-10 blur-xl"></div>
-              
-              <div className="space-y-4 pt-4 sm:pt-8">
-                <div className="relative h-32 sm:h-64 rounded-lg overflow-hidden shadow-xl border border-gold/10">
-                  <Image 
-                    src="/images/gallery/gallery1.jpg" 
-                    alt="Building Elevation" 
-                    fill 
-                    className="object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="relative h-28 sm:h-48 rounded-lg overflow-hidden shadow-xl border border-gold/10">
-                  <Image 
-                    src="/images/gallery/gallery3.jpg" 
-                    alt="Clubhouse Exterior" 
-                    fill 
-                    className="object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="relative h-28 sm:h-48 rounded-lg overflow-hidden shadow-xl border border-gold/10">
-                  <Image 
-                    src="/images/gallery/gallery4.jpg" 
-                    alt="Landscaped Gardens" 
-                    fill 
-                    className="object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="relative h-32 sm:h-64 rounded-lg overflow-hidden shadow-xl border border-gold/10">
-                  <Image 
-                    src="/images/gallery/gallery2.jpg" 
-                    alt="Apartment Balcony View" 
-                    fill 
-                    className="object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Description Text */}
-            <div className="lg:col-span-6 space-y-6 lg:pl-4">
-              <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                FCP Harmony is a premium 7.5-acre gated enclave of 690 luxury apartments inside MIHAN&apos;s landmark 31-acre international township. The modern G+Podium+15 towers feature secure double-level parking, 3 open ventilation sides, and resort-style amenities.
-              </p>
-
-              <blockquote className="border-l-4 border-gold pl-4 py-3 italic text-navy font-semibold bg-gray-50 text-sm sm:text-base">
-                &ldquo;Live in a green paradise with amenities par excellence!&rdquo;
-              </blockquote>
-
-              <div className="pt-4 flex flex-col sm:flex-row gap-3 w-full">
-                <button 
-                  onClick={() => openEnquiryModal("Download Project Brochure", "2 BHK")}
-                  className="w-full sm:w-auto bg-[#C9A227] hover:bg-gold-light text-navy font-extrabold px-6 py-3.5 rounded-lg text-xs sm:text-sm tracking-wider uppercase shadow-md transition-all duration-300 text-center"
-                >
-                  Download Brochure
-                </button>
-                <a 
-                  href="#configurations"
-                  className="w-full sm:w-auto border-2 border-[#1a2744] hover:bg-[#1a2744] hover:text-white text-navy font-extrabold px-6 py-3.5 rounded-lg text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center shadow-sm text-center"
-                >
-                  View Configurations
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Why IJM First City - Navy gradient, noise overlay */}
-      <section 
-        id="why-ijm" 
-        className="py-24 sm:py-32 bg-gradient-to-r from-[#0f1e3d] to-[#1a2744] relative overflow-hidden text-white noise-overlay"
-      >
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-          
-          <div className="flex flex-col items-center mb-16">
-            <span className="text-[#C9A227] font-bold text-xs uppercase tracking-widest block mb-2">WHY US</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black text-white text-center tracking-tight leading-tight">Why Choose IJM FCP Harmony?</h2>
-            <div className="w-12 h-[3px] bg-[#C9A227] mt-4 rounded-full"></div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            
-            {/* Card 1 */}
-            <div className="bg-white/[0.03] border border-white/10 p-8 sm:p-10 rounded-lg hover:border-gold/30 transition-all duration-300 hover:-translate-y-1">
-              <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/25 flex items-center justify-center text-gold mb-6">
-                <Trees size={28} />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-3">7.5 Acres Gated Paradise</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                7.5 acres of masterplanned layouts inside a secure, fully gated premium integrated township.
-              </p>
-            </div>
-
-            {/* Card 2 */}
-            <div className="bg-white/[0.03] border border-white/10 p-8 sm:p-10 rounded-lg hover:border-gold/30 transition-all duration-300 hover:-translate-y-1">
-              <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/25 flex items-center justify-center text-gold mb-6">
-                <Building size={28} />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-3">Premium Infrastructure</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                6 grand residential towers built with advanced RCC Shear Wall technology (G + Podium + 15 floors).
-              </p>
-            </div>
-
-            {/* Card 3 */}
-            <div className="bg-white/[0.03] border border-white/10 p-8 sm:p-10 rounded-lg hover:border-gold/30 transition-all duration-300 hover:-translate-y-1">
-              <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/25 flex items-center justify-center text-gold mb-6">
-                <Award size={28} />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-3">100+ World-Class Amenities</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Over 100 indoor & outdoor amenities including a double-height clubhouse, Miyawaki forest, and sports courts.
-              </p>
-            </div>
-
-            {/* Card 4 */}
-            <div className="bg-white/[0.03] border border-white/10 p-8 sm:p-10 rounded-lg hover:border-gold/30 transition-all duration-300 hover:-translate-y-1">
-              <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/25 flex items-center justify-center text-gold mb-6">
-                <Compass size={28} />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-3">3-Side Open Ventilation</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Designed with open space on 3 sides to provide unmatched natural cross-ventilation and sunlight.
-              </p>
-            </div>
-
-            {/* Card 5 */}
-            <div className="bg-white/[0.03] border border-white/10 p-8 sm:p-10 rounded-lg hover:border-gold/30 transition-all duration-300 hover:-translate-y-1">
-              <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/25 flex items-center justify-center text-gold mb-6">
-                <Maximize2 size={28} />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-3">Efficient Layout Designs</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Smart layout designs (849 - 1417 Sq.ft.) with zero space wastage for maximum family comfort.
-              </p>
-            </div>
-
-            {/* Card 6 */}
-            <div className="bg-white/[0.03] border border-white/10 p-8 sm:p-10 rounded-lg hover:border-gold/30 transition-all duration-300 hover:-translate-y-1">
-              <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/25 flex items-center justify-center text-gold mb-6">
-                <Shield size={28} />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-3">Investment Value</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Located in the heart of MIHAN SEZ (Nagpur&apos;s primary IT hub) with high rental yields and capital growth.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Configuration Section - Light grey bg */}
-      <section id="configurations" className="py-24 sm:py-32 bg-[#f8f9fc]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col items-center mb-16">
-            <span className="text-[#C9A227] font-bold text-xs uppercase tracking-widest block mb-2">FLOOR CONFIGURATIONS</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black text-navy text-center tracking-tight leading-tight">Units, Carpet Areas & Pricing</h2>
-            <div className="w-12 h-[3px] bg-[#C9A227] mt-4 rounded-full"></div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* Card 2BHK */}
-            <SpotlightCard spotlightColor="rgba(201, 162, 39, 0.12)" className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:border-gold/50 flex flex-col justify-between border-t-4 border-t-gold">
-              <div className="p-6 sm:p-8 space-y-4">
-                <div className="flex justify-between items-start">
-                  <span className="inline-block bg-[#1a2744]/10 text-navy font-bold text-xs px-3 py-1 rounded-full uppercase">Spacious living</span>
-                  <span className="text-gold font-black text-sm">₹73 Lakhs onwards*</span>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-extrabold text-navy">2 BHK Apartment</h3>
-                  <p className="text-gray-500 text-sm mt-1">Perfect for nuclear families</p>
-                </div>
-                <div className="h-px bg-gray-100 my-2"></div>
-                <ul className="space-y-2.5 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <Check size={14} className="text-gold" />
-                    <span>Carpet Area: <strong className="text-[#1a2744] text-base">849 - 912 Sq.ft.</strong></span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check size={14} className="text-gold" />
-                    <span>3 Open Sides</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check size={14} className="text-gold" />
-                    <span>Spacious Master Bedroom</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="p-6 bg-gray-50 border-t border-gray-100">
-                <button 
-                  onClick={() => openEnquiryModal("Enquire: 2 BHK pricing & floor plan", "2 BHK")}
-                  className="w-full bg-[#C9A227] hover:bg-gold-light text-navy font-extrabold py-3 rounded-lg text-xs tracking-wider uppercase shadow-md transition-all duration-300"
-                >
-                  Get Pricing Sheet
-                </button>
-              </div>
-            </SpotlightCard>
-
-            {/* Card 2.5BHK - Highlighted */}
-            <SpotlightCard spotlightColor="rgba(201, 162, 39, 0.15)" className="bg-white rounded-lg border-2 border-gold overflow-hidden shadow-2xl relative flex flex-col justify-between transform lg:scale-[1.05] transition-all duration-300 border-t-4 border-t-gold z-10">
-              <div className="absolute top-0 right-0 bg-[#C9A227] text-[#1a2744] text-[10px] font-extrabold uppercase px-4 py-1.5 tracking-wider rounded-bl-lg">
-                Most Popular
-              </div>
-              
-              <div className="p-6 sm:p-8 space-y-4">
-                <div className="flex justify-between items-start">
-                  <span className="inline-block bg-gold/10 text-gold font-bold text-xs px-3 py-1 rounded-full uppercase">Optimal Utility</span>
-                  <span className="text-gold font-black text-sm">₹87 Lakhs onwards*</span>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-extrabold text-navy">2.5 BHK Apartment</h3>
-                  <p className="text-gray-500 text-sm mt-1">Includes additional study/utility room</p>
-                </div>
-                <div className="h-px bg-gray-100 my-2"></div>
-                <ul className="space-y-2.5 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <Check size={14} className="text-gold" />
-                    <span>Carpet Area: <strong className="text-[#1a2744] text-base">1050 - 1115 Sq.ft.</strong></span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check size={14} className="text-gold" />
-                    <span>Dedicated Study/Workroom</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check size={14} className="text-gold" />
-                    <span>2 Spacious Balconies</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="p-6 bg-gray-50 border-t border-gray-100">
-                <button 
-                  onClick={() => openEnquiryModal("Enquire: 2.5 BHK pricing & floor plan", "2.5 BHK")}
-                  className="w-full bg-[#C9A227] hover:bg-gold-light text-navy font-extrabold py-3 rounded-lg text-xs tracking-wider uppercase shadow-md transition-all duration-300"
-                >
-                  Get Pricing Sheet
-                </button>
-              </div>
-            </SpotlightCard>
-
-            {/* Card 3BHK */}
-            <SpotlightCard spotlightColor="rgba(201, 162, 39, 0.12)" className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:border-gold/50 flex flex-col justify-between border-t-4 border-t-gold">
-              <div className="p-6 sm:p-8 space-y-4">
-                <div className="flex justify-between items-start">
-                  <span className="inline-block bg-[#1a2744]/10 text-navy font-bold text-xs px-3 py-1 rounded-full uppercase">Ultimate Luxury</span>
-                  <span className="text-gold font-black text-sm">₹1.14 Crore onwards*</span>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-extrabold text-navy">3 BHK Apartment</h3>
-                  <p className="text-gray-500 text-sm mt-1">Grand designs for large families</p>
-                </div>
-                <div className="h-px bg-gray-100 my-2"></div>
-                <ul className="space-y-2.5 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <Check size={14} className="text-gold" />
-                    <span>Carpet Area: <strong className="text-[#1a2744] text-base">1250 - 1417 Sq.ft.</strong></span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check size={14} className="text-gold" />
-                    <span>3 Grand Bedrooms & Balconies</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check size={14} className="text-gold" />
-                    <span>Bare Kitchen Customization</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="p-6 bg-gray-50 border-t border-gray-100">
-                <button 
-                  onClick={() => openEnquiryModal("Enquire: 3 BHK pricing & floor plan", "3 BHK")}
-                  className="w-full bg-[#C9A227] hover:bg-gold-light text-navy font-extrabold py-3 rounded-lg text-xs tracking-wider uppercase shadow-md transition-all duration-300"
-                >
-                  Get Pricing Sheet
-                </button>
-              </div>
-            </SpotlightCard>
-
-          </div>
-
-          <div className="mt-12 text-center">
-            <p className="text-xs text-gray-400 italic">
-              *Prices shown represent starting BSP (Basic Sale Price) and do not include statutory charges, parking, amenities fees or GST. Area is approximate RERA carpet area.
-            </p>
-          </div>
-
-        </div>
-      </section>
-
-      {/* Amenities Section - White bg */}
-      <section id="amenities" className="py-24 sm:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col items-center mb-16">
-            <span className="text-[#C9A227] font-bold text-xs uppercase tracking-widest block mb-2">RESORT LIVING</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black text-navy text-center tracking-tight leading-tight">100+ Amenities Par Excellence</h2>
-            <div className="w-12 h-[3px] bg-[#C9A227] mt-4 rounded-full"></div>
-          </div>
-
-          {/* Grid Layout: 2 columns on mobile, 4 columns on desktop */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            
-            {/* Amenity 1 */}
-            <div className="group relative h-40 sm:h-64 rounded-lg overflow-hidden border border-gray-100 shadow-md transition-all duration-300 hover:shadow-xl">
-              <Image 
-                src="/images/amenities/Swimming-Pool.png" 
-                alt="Swimming Pool" 
-                fill 
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1628] via-[#0e1628]/40 to-transparent z-[2]"></div>
-              <span className="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 text-white font-extrabold text-xs sm:text-base tracking-wide z-[3]">Swimming Pool</span>
-            </div>
-
-            {/* Amenity 2 */}
-            <div className="group relative h-40 sm:h-64 rounded-lg overflow-hidden border border-gray-100 shadow-md transition-all duration-300 hover:shadow-xl">
-              <Image 
-                src="/images/amenities/Multipurpose-Hall.png" 
-                alt="Multipurpose Hall" 
-                fill 
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1628] via-[#0e1628]/40 to-transparent z-[2]"></div>
-              <span className="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 text-white font-extrabold text-xs sm:text-base tracking-wide z-[3]">Multipurpose Hall</span>
-            </div>
-
-            {/* Amenity 3 */}
-            <div className="group relative h-40 sm:h-64 rounded-lg overflow-hidden border border-gray-100 shadow-md transition-all duration-300 hover:shadow-xl">
-              <Image 
-                src="/images/amenities/Cricket-Pitch.png" 
-                alt="Cricket Pitch" 
-                fill 
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1628] via-[#0e1628]/40 to-transparent z-[2]"></div>
-              <span className="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 text-white font-extrabold text-xs sm:text-base tracking-wide z-[3]">Cricket Pitch</span>
-            </div>
-
-            {/* Amenity 4 */}
-            <div className="group relative h-40 sm:h-64 rounded-lg overflow-hidden border border-gray-100 shadow-md transition-all duration-300 hover:shadow-xl">
-              <Image 
-                src="/images/amenities/Gymnasium.png" 
-                alt="Gymnasium" 
-                fill 
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1628] via-[#0e1628]/40 to-transparent z-[2]"></div>
-              <span className="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 text-white font-extrabold text-xs sm:text-base tracking-wide z-[3]">Gymnasium</span>
-            </div>
-
-            {/* Amenity 5 */}
-            <div className="group relative h-40 sm:h-64 rounded-lg overflow-hidden border border-gray-100 shadow-md transition-all duration-300 hover:shadow-xl">
-              <Image 
-                src="/images/amenities/Jacuzzi.png" 
-                alt="Jacuzzi" 
-                fill 
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1628] via-[#0e1628]/40 to-transparent z-[2]"></div>
-              <span className="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 text-white font-extrabold text-xs sm:text-base tracking-wide z-[3]">Jacuzzi</span>
-            </div>
-
-            {/* Amenity 6 */}
-            <div className="group relative h-40 sm:h-64 rounded-lg overflow-hidden border border-gray-100 shadow-md transition-all duration-300 hover:shadow-xl">
-              <Image 
-                src="/images/amenities/Squash-Court.png" 
-                alt="Squash Court" 
-                fill 
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1628] via-[#0e1628]/40 to-transparent z-[2]"></div>
-              <span className="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 text-white font-extrabold text-xs sm:text-base tracking-wide z-[3]">Squash Court</span>
-            </div>
-
-            {/* Amenity 7 */}
-            <div className="group relative h-40 sm:h-64 rounded-lg overflow-hidden border border-gray-100 shadow-md transition-all duration-300 hover:shadow-xl">
-              <Image 
-                src="/images/amenities/Basketball-Court.png" 
-                alt="Basketball Court" 
-                fill 
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1628] via-[#0e1628]/40 to-transparent z-[2]"></div>
-              <span className="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 text-white font-extrabold text-xs sm:text-base tracking-wide z-[3]">Basketball Court</span>
-            </div>
-
-            {/* Amenity 8 */}
-            <div className="group relative h-40 sm:h-64 rounded-lg overflow-hidden border border-gray-100 shadow-md transition-all duration-300 hover:shadow-xl">
-              <Image 
-                src="/images/amenities/Tennis-Court.png" 
-                alt="Tennis Court" 
-                fill 
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e1628] via-[#0e1628]/40 to-transparent z-[2]"></div>
-              <span className="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 text-white font-extrabold text-xs sm:text-base tracking-wide z-[3]">Tennis Court</span>
-            </div>
-
-          </div>
-
-          <div className="mt-12 text-center">
-            <button 
-              onClick={() => openEnquiryModal("Enquire: View full list of 100+ amenities", "2.5 BHK")}
-              className="bg-[#C9A227] hover:bg-gold-light text-[#1a2744] font-extrabold px-8 py-3.5 rounded-lg text-xs sm:text-sm tracking-wider uppercase shadow-md transition-all duration-300"
-            >
-              Request Amenity Brochure
-            </button>
-          </div>
-
-        </div>
-      </section>
-
-      {/* Master Plan - Light grey bg */}
-      <section id="master-plan" className="py-24 sm:py-32 bg-[#f8f9fc] border-t border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col items-center mb-16">
-            <span className="text-[#C9A227] font-bold text-xs uppercase tracking-widest block mb-2">MASTER LAYOUT</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black text-navy text-center tracking-tight leading-tight">Project Master Plan</h2>
-            <div className="w-12 h-[3px] bg-[#C9A227] mt-4 rounded-full"></div>
-          </div>
-
-          <div className="bg-white p-4 sm:p-8 rounded-lg shadow-xl border border-gray-200 max-w-5xl mx-auto">
-            <div className="relative w-full h-[350px] sm:h-[500px] md:h-[600px] lg:h-[650px] overflow-hidden rounded-lg bg-gray-50">
-              <Image 
-                src="/images/master-plan.png" 
-                alt="IJM First City Master Plan" 
-                fill 
-                className="object-contain"
-                loading="lazy"
-              />
-            </div>
-            <div className="mt-6 text-center">
-              <button 
-                onClick={() => openEnquiryModal("Request High-Res Master Plan", "2 BHK")}
-                className="bg-[#C9A227] hover:bg-gold-light text-navy font-extrabold px-8 py-3.5 rounded-lg text-xs tracking-wider uppercase transition-all duration-300 shadow-md"
-              >
-                Download PDF Master Plan
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* Floor Plans Section - White bg */}
-      <section id="floor-plans" className="py-24 sm:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col items-center mb-16">
-            <span className="text-[#C9A227] font-bold text-xs uppercase tracking-widest block mb-2">INSIDE HARMONY</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black text-navy text-center tracking-tight leading-tight">Typical Floor Plans</h2>
-            <div className="w-12 h-[3px] bg-[#C9A227] mt-4 rounded-full"></div>
-          </div>
-
-          <div className="max-w-5xl mx-auto">
-            {/* Tabs Selector */}
-            <div className="flex bg-[#0f1e3d] p-1.5 rounded-lg mb-10 max-w-lg mx-auto shadow-inner border border-white/5 justify-between">
-              <button 
-                onClick={() => setActiveFloorTab("2bhk")}
-                className={`flex-1 py-3 px-3 sm:px-6 text-xs sm:text-sm font-bold tracking-wider uppercase rounded-md transition-all duration-300 ${
-                  activeFloorTab === "2bhk" 
-                    ? "bg-[#C9A227] text-navy font-black shadow-md" 
-                    : "text-gray-300 hover:text-white"
-                }`}
-              >
-                2 BHK<span className="hidden sm:inline"> Plan</span>
-              </button>
-              <button 
-                onClick={() => setActiveFloorTab("2.5bhk")}
-                className={`flex-1 py-3 px-3 sm:px-6 text-xs sm:text-sm font-bold tracking-wider uppercase rounded-md transition-all duration-300 ${
-                  activeFloorTab === "2.5bhk" 
-                    ? "bg-[#C9A227] text-navy font-black shadow-md" 
-                    : "text-gray-300 hover:text-white"
-                }`}
-              >
-                2.5 BHK<span className="hidden sm:inline"> Plan</span>
-              </button>
-              <button 
-                onClick={() => setActiveFloorTab("3bhk")}
-                className={`flex-1 py-3 px-3 sm:px-6 text-xs sm:text-sm font-bold tracking-wider uppercase rounded-md transition-all duration-300 ${
-                  activeFloorTab === "3bhk" 
-                    ? "bg-[#C9A227] text-navy font-black shadow-md" 
-                    : "text-gray-300 hover:text-white"
-                }`}
-              >
-                3 BHK<span className="hidden sm:inline"> Plan</span>
-              </button>
-            </div>
-
-            {/* Tab Contents */}
-            <div className="bg-[#f8f9fc] p-6 sm:p-10 border border-gray-200 rounded-lg shadow-lg min-h-[400px] flex flex-col lg:flex-row gap-12 items-center justify-between">
-              {activeFloorTab === "2bhk" && (
-                <>
-                  <div className="lg:w-1/2 space-y-6">
-                    <h3 className="text-2xl sm:text-3xl font-extrabold text-navy">2 BHK Typical Layout</h3>
-                    <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
-                      A smart layout featuring a spacious living/dining area, master bedroom with attached bathroom, guest bedroom, and a private balcony.
-                    </p>
-                    <ul className="space-y-3 text-sm sm:text-base text-gray-600">
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>RERA Carpet Area: <strong>849 - 912 Sq.ft.</strong></span>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>2 Modern Bathrooms</span>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>1 Utility Balcony</span>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>Open ventilation on 3 sides</span>
-                      </li>
-                    </ul>
-                    <button 
-                      onClick={() => openEnquiryModal("Request 2 BHK Floor Plan details", "2 BHK")}
-                      className="bg-[#C9A227] hover:bg-gold-light text-[#1a2744] font-extrabold px-6 py-3.5 rounded-lg text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md"
-                    >
-                      Enquire For Cost Sheet
-                    </button>
-                  </div>
-                  <div className="lg:w-1/2 relative w-full h-64 sm:h-[450px] bg-white rounded-lg border border-gray-150 p-4 shadow-md">
-                    <Image 
-                      src="/images/Typical-Floor-Plan.png" 
-                      alt="2 BHK Floor Plan" 
-                      fill 
-                      className="object-contain"
-                      loading="lazy"
-                    />
-                  </div>
-                </>
-              )}
-
-              {activeFloorTab === "2.5bhk" && (
-                <>
-                  <div className="lg:w-1/2 space-y-6">
-                    <h3 className="text-2xl sm:text-3xl font-extrabold text-navy">2.5 BHK Typical Layout</h3>
-                    <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
-                      Includes a flexible half-bedroom ideal for a private office, study, or prayer room alongside standard premium living spaces.
-                    </p>
-                    <ul className="space-y-3 text-sm sm:text-base text-gray-600">
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>RERA Carpet Area: <strong>1050 - 1115 Sq.ft.</strong></span>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>2 Bathrooms + 1 Study/Workroom</span>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>2 Standing Balconies</span>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>Modular layout customization option</span>
-                      </li>
-                    </ul>
-                    <button 
-                      onClick={() => openEnquiryModal("Request 2.5 BHK Floor Plan details", "2.5 BHK")}
-                      className="bg-[#C9A227] hover:bg-gold-light text-[#1a2744] font-extrabold px-6 py-3.5 rounded-lg text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md"
-                    >
-                      Enquire For Cost Sheet
-                    </button>
-                  </div>
-                  <div className="lg:w-1/2 relative w-full h-64 sm:h-[450px] bg-white rounded-lg border border-gray-150 p-4 shadow-md">
-                    <Image 
-                      src="/images/Floor-Plan.png" 
-                      alt="2.5 BHK Floor Plan" 
-                      fill 
-                      className="object-contain"
-                      loading="lazy"
-                    />
-                  </div>
-                </>
-              )}
-
-              {activeFloorTab === "3bhk" && (
-                <>
-                  <div className="lg:w-1/2 space-y-6">
-                    <h3 className="text-2xl sm:text-3xl font-extrabold text-navy">3 BHK Typical Layout</h3>
-                    <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
-                      Crafted for spacious luxury with a grand foyer entrance, large modular kitchen, utility balconies, and three private bedrooms.
-                    </p>
-                    <ul className="space-y-3 text-sm sm:text-base text-gray-600">
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>RERA Carpet Area: <strong>1250 - 1417 Sq.ft.</strong></span>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>3 Grand Bathrooms</span>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>3 Large Balconies</span>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Check size={16} className="text-[#C9A227] stroke-[3]" />
-                        <span>Beautiful corner-facing ventilation layout</span>
-                      </li>
-                    </ul>
-                    <button 
-                      onClick={() => openEnquiryModal("Request 3 BHK Floor Plan details", "3 BHK")}
-                      className="bg-[#C9A227] hover:bg-gold-light text-[#1a2744] font-extrabold px-6 py-3.5 rounded-lg text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md"
-                    >
-                      Enquire For Cost Sheet
-                    </button>
-                  </div>
-                  <div className="lg:w-1/2 relative w-full h-64 sm:h-[450px] bg-white rounded-lg border border-gray-150 p-4 shadow-md">
-                    <Image 
-                      src="/images/Harmony6.png" 
-                      alt="3 BHK Floor Plan" 
-                      fill 
-                      className="object-contain"
-                      loading="lazy"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* Specifications Section - Light grey bg */}
-      <section id="specifications" className="py-24 sm:py-32 bg-[#f8f9fc] border-t border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col items-center mb-16">
-            <span className="text-[#C9A227] font-bold text-xs uppercase tracking-widest block mb-2">QUALITY STANDARDS</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black text-navy text-center tracking-tight leading-tight">Construction & Finish Specifications</h2>
-            <div className="w-12 h-[3px] bg-[#C9A227] mt-4 rounded-full"></div>
-          </div>
-
-          <div className="max-w-4xl mx-auto bg-white rounded-lg border border-gray-200 shadow-xl overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-150">
-              
-              {/* Left Column */}
-              <div className="divide-y divide-gray-100">
-                <div className="p-6 sm:p-8 space-y-2">
-                  <h4 className="text-sm font-bold text-gold uppercase tracking-wider">Structure & Roof</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    RCC footing and shear wall seismic-safe framework design.
-                  </p>
-                </div>
-                <div className="p-6 sm:p-8 space-y-2">
-                  <h4 className="text-sm font-bold text-gold uppercase tracking-wider">Windows</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Premium Aluminium / UPVC sliding windows with high-grade glazing.
-                  </p>
-                </div>
-                <div className="p-6 sm:p-8 space-y-2">
-                  <h4 className="text-sm font-bold text-gold uppercase tracking-wider">Doors</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    TATA PARVESH external wooden finish security main door.
-                  </p>
-                </div>
-                <div className="p-6 sm:p-8 space-y-2">
-                  <h4 className="text-sm font-bold text-gold uppercase tracking-wider">Floor Finishes</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Premium Vitrified tiles in rooms; anti-skid tiles in utility and wet areas.
-                  </p>
-                </div>
-              </div>
-
-              {/* Right Column */}
-              <div className="divide-y divide-gray-100">
-                <div className="p-6 sm:p-8 space-y-2">
-                  <h4 className="text-sm font-bold text-gold uppercase tracking-wider">Wall Finishes</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Emulsion interior paint over wall putty; weatherproof exterior paint.
-                  </p>
-                </div>
-                <div className="p-6 sm:p-8 space-y-2">
-                  <h4 className="text-sm font-bold text-gold uppercase tracking-wider">Sanitary & Fittings</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    High-quality EWC and branded bath fittings with geyser provisions.
-                  </p>
-                </div>
-                <div className="p-6 sm:p-8 space-y-2">
-                  <h4 className="text-sm font-bold text-gold uppercase tracking-wider">Electrical Systems</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Concealed copper wiring, modular switches, and AC points in all bedrooms.
-                  </p>
-                </div>
-                <div className="p-6 sm:p-8 space-y-2">
-                  <h4 className="text-sm font-bold text-gold uppercase tracking-wider">Lifts & Security</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    High-speed passenger lifts and 24x7 gated township security system.
-                  </p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* Connectivity Section - White bg */}
-      <section id="connectivity" className="py-24 sm:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col items-center mb-16">
-            <span className="text-[#C9A227] font-bold text-xs uppercase tracking-widest block mb-2">LOCATION ADVANTAGE</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black text-navy text-center tracking-tight leading-tight">Connectivity & Landmarks</h2>
-            <div className="w-12 h-[3px] bg-[#C9A227] mt-4 rounded-full"></div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-            
-            {/* Left: Landmarks List with Gold dots */}
-            <div className="lg:col-span-5 space-y-6">
-              <h3 className="text-2xl font-extrabold text-navy">Distances From First City</h3>
-              
-              <div className="divide-y divide-gray-150">
-                <div className="py-3.5 flex justify-between items-center text-sm sm:text-base">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#C9A227] shrink-0"></span>
-                    <span className="font-semibold text-navy">Infosys</span>
-                  </div>
-                  <span className="text-gold font-bold bg-[#1a2744]/10 px-3 py-1 rounded-sm text-xs">3 Mins</span>
-                </div>
-
-                <div className="py-3.5 flex justify-between items-center text-sm sm:text-base">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#C9A227] shrink-0"></span>
-                    <span className="font-semibold text-navy">AIIMS</span>
-                  </div>
-                  <span className="text-gold font-bold bg-[#1a2744]/10 px-3 py-1 rounded-sm text-xs">5 Mins</span>
-                </div>
-
-                <div className="py-3.5 flex justify-between items-center text-sm sm:text-base">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#C9A227] shrink-0"></span>
-                    <span className="font-semibold text-navy">Hexaware Technologies</span>
-                  </div>
-                  <span className="text-gold font-bold bg-[#1a2744]/10 px-3 py-1 rounded-sm text-xs">5 Mins</span>
-                </div>
-
-                <div className="py-3.5 flex justify-between items-center text-sm sm:text-base">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#C9A227] shrink-0"></span>
-                    <span className="font-semibold text-navy">TCS</span>
-                  </div>
-                  <span className="text-gold font-bold bg-[#1a2744]/10 px-3 py-1 rounded-sm text-xs">7 Mins</span>
-                </div>
-
-                <div className="py-3.5 flex justify-between items-center text-sm sm:text-base">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#C9A227] shrink-0"></span>
-                    <span className="font-semibold text-navy">National Cancer Institute</span>
-                  </div>
-                  <span className="text-gold font-bold bg-[#1a2744]/10 px-3 py-1 rounded-sm text-xs">8 Mins</span>
-                </div>
-
-                <div className="py-3.5 flex justify-between items-center text-sm sm:text-base">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#C9A227] shrink-0"></span>
-                    <span className="font-semibold text-navy">HCL</span>
-                  </div>
-                  <span className="text-gold font-bold bg-[#1a2744]/10 px-3 py-1 rounded-sm text-xs">8 Mins</span>
-                </div>
-
-                <div className="py-3.5 flex justify-between items-center text-sm sm:text-base">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#C9A227] shrink-0"></span>
-                    <span className="font-semibold text-navy">Tech Mahindra</span>
-                  </div>
-                  <span className="text-gold font-bold bg-[#1a2744]/10 px-3 py-1 rounded-sm text-xs">10 Mins</span>
-                </div>
-
-                <div className="py-3.5 flex justify-between items-center text-sm sm:text-base">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#C9A227] shrink-0"></span>
-                    <span className="font-semibold text-navy">Govt. Medical College</span>
-                  </div>
-                  <span className="text-gold font-bold bg-[#1a2744]/10 px-3 py-1 rounded-sm text-xs">20 Mins</span>
-                </div>
-
-                <div className="py-3.5 flex justify-between items-center text-sm sm:text-base">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#C9A227] shrink-0"></span>
-                    <span className="font-semibold text-navy">Nagpur Intl Airport</span>
-                  </div>
-                  <span className="text-gold font-bold bg-[#1a2744]/10 px-3 py-1 rounded-sm text-xs">12 Mins</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Map image (Larger size) */}
-            <div className="lg:col-span-7 bg-white p-4 rounded-lg shadow-xl border border-gray-200">
-              <div className="relative w-full h-[350px] sm:h-[500px] overflow-hidden rounded-lg bg-gray-50 border border-gray-100">
-                <Image 
-                  src="/images/map.png" 
-                  alt="IJM First City Location Map" 
-                  fill 
-                  className="object-contain"
-                  loading="lazy"
-                />
-              </div>
-              <div className="p-4 text-center bg-gray-50 rounded-lg border-t border-gray-100 mt-3">
-                <a 
-                  href="https://maps.app.goo.gl/cf8f6266e9755bf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-navy hover:text-gold font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-colors"
-                >
-                  <MapPin size={16} className="text-[#C9A227]" />
-                  <span>Open In Google Maps</span>
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* About IJM - Navy gradient, noise overlay */}
-      <section id="about" className="py-24 sm:py-32 bg-gradient-to-r from-[#0f1e3d] to-[#1a2744] relative text-white noise-overlay">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-            
-            {/* Developer statistics */}
-            <div className="lg:col-span-5 space-y-6 lg:pr-8">
-              <div className="inline-flex items-center gap-2 text-gold font-bold text-xs uppercase tracking-wider">
-                <Award size={16} />
-                <span>Developer Credibility</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">About IJM Group</h2>
-              <div className="w-12 h-1 bg-gold"></div>
-              
-              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                IJM India Infrastructure Limited (IJMII) is a key subsidiary of the Malaysian multinational conglomerate IJM Corporation Berhad.
-              </p>
-              
-              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                With over 25 years of construction expertise in India, IJMII actively shapes sustainable communities and landmark infrastructure.
-              </p>
-
-              <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/10">
-                <div>
-                  <span className="block text-3xl font-extrabold text-gold">25+ YRS</span>
-                  <span className="block text-xs uppercase tracking-widest text-gray-400 mt-1">Experience in India</span>
-                </div>
-                <div>
-                  <span className="block text-3xl font-extrabold text-gold">20M+ SQ.FT</span>
-                  <span className="block text-xs uppercase tracking-widest text-gray-400 mt-1">Area Delivered</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Logo and Brand copy */}
-            <div className="lg:col-span-7 bg-[#151f35] p-8 rounded-lg border border-white/5 space-y-6 relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 rounded-full blur-2xl"></div>
-              
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-12 bg-white p-2 rounded-sm flex items-center justify-center">
-                  <Image 
-                    src="/images/ijm_logo.png" 
-                    alt="IJM Logo" 
-                    width={64}
-                    height={48}
-                    className="object-contain p-2"
-                  />
-                </div>
-                <div>
-                  <h4 className="text-lg font-bold text-white">Nagpur Integrated Township Pvt. Ltd.</h4>
-                  <p className="text-xs text-gray-400">A Special Purpose Vehicle (SPV) of IJM Group</p>
-                </div>
-              </div>
-
-              <p className="text-gray-400 text-sm leading-relaxed">
-                NITPL delivers global engineering standards to Central India, building high-quality, transparently-managed residential spaces.
-              </p>
-
-              <div className="p-4 bg-navy-dark/45 border-l-2 border-gold rounded-r-lg text-xs text-gray-300">
-                Decades of engineering precision and a zero-delay delivery track record make IJM First City one of the safest properties in Maharashtra.
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Second Lead Form - Light grey bg */}
-      <section className="py-24 sm:py-32 bg-[#f8f9fc] relative overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          <div className="bg-white rounded-lg border border-gray-200 shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12">
-            
-            {/* Sidebar CTA info */}
-            <div className="md:col-span-5 bg-gradient-to-br from-[#0f1e3d] to-[#1a2744] p-8 text-white flex flex-col justify-between relative overflow-hidden noise-overlay">
-              <div className="space-y-4 relative z-10">
-                <span className="text-gold font-bold text-xs uppercase tracking-widest">Exclusive Access</span>
-                <h3 className="text-2xl font-extrabold tracking-tight">Book a Free Site Visit Today</h3>
-                <div className="w-12 h-1 bg-gold"></div>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  Schedule a private tour of the actual location in Mihan, inspect show apartments, and consult with our financial advisors.
-                </p>
-              </div>
-              
-              <div className="space-y-3 pt-8 relative z-10 text-xs text-gray-400 border-t border-white/10">
-                <p className="flex items-center gap-2">
-                  <CheckCircle size={14} className="text-gold" />
-                  <span>Free Cab Pick & Drop available</span>
-                </p>
-                <p className="flex items-center gap-2">
-                  <CheckCircle size={14} className="text-gold" />
-                  <span>Interactive project model presentation</span>
-                </p>
-              </div>
-            </div>
-
-            {/* Visit Form: Rounded inputs */}
-            <div className="md:col-span-7 p-8">
-              <form onSubmit={handleVisitSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-navy uppercase mb-1">Full Name*</label>
-                    <input 
-                      type="text" 
-                      required
-                      value={visitForm.name}
-                      onChange={(e) => setVisitForm({...visitForm, name: e.target.value})}
-                      placeholder="Full Name" 
-                      className={`w-full px-3 py-2 bg-gray-50 border ${errors.name ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:border-gold text-sm text-navy`}
-                    />
-                    {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-navy uppercase mb-1">Phone Number*</label>
-                    <input 
-                      type="tel" 
-                      required
-                      value={visitForm.phone}
-                      onChange={(e) => setVisitForm({...visitForm, phone: e.target.value})}
-                      placeholder="10-digit Mobile" 
-                      className={`w-full px-3 py-2 bg-gray-50 border ${errors.phone ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:border-gold text-sm text-navy`}
-                    />
-                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-navy uppercase mb-1">Email Address*</label>
-                    <input 
-                      type="email" 
-                      required
-                      value={visitForm.email}
-                      onChange={(e) => setVisitForm({...visitForm, email: e.target.value})}
-                      placeholder="name@domain.com" 
-                      className={`w-full px-3 py-2 bg-gray-50 border ${errors.email ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:border-gold text-sm text-navy`}
-                    />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-navy uppercase mb-1">Preferred Date</label>
-                    <input 
-                      type="date" 
-                      value={visitForm.date || ""}
-                      onChange={(e) => setVisitForm({...visitForm, date: e.target.value})}
-                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-gold text-sm text-navy"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-navy uppercase mb-1">BHK Selection</label>
-                  <select 
-                    value={visitForm.config}
-                    onChange={(e) => setVisitForm({...visitForm, config: e.target.value})}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-gold text-sm text-navy"
-                  >
-                    <option value="2 BHK">2 BHK Apartments</option>
-                    <option value="2.5 BHK">2.5 BHK Apartments</option>
-                    <option value="3 BHK">3 BHK Apartments</option>
-                    <option value="3.5 BHK">3.5 BHK Premium</option>
-                  </select>
-                </div>
-
-                <div className="flex items-start text-[10px] sm:text-xs text-gray-500 leading-normal gap-2 pt-1">
-                  <input type="checkbox" defaultChecked className="mt-0.5 border-gray-300 rounded text-gold focus:ring-gold" required />
-                  <span>I authorize Nagpur Integrated Township Private Limited to call, text or whatsapp overrides DNC/NDNC.</span>
-                </div>
-
-                <button 
-                  type="submit" 
-                  className="w-full bg-[#C9A227] hover:bg-gold-light text-[#1a2744] font-extrabold py-3.5 rounded-lg transition-all duration-300 shadow-md uppercase tracking-wider text-xs sm:text-sm"
-                >
-                  Book Free Site Visit
-                </button>
-              </form>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section - White bg */}
-      <section className="py-24 sm:py-32 bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col items-center mb-16">
-            <span className="text-[#C9A227] font-bold text-xs uppercase tracking-widest block mb-2">HAPPY FAMILIES</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black text-navy text-center tracking-tight leading-tight">What Our Buyers Say</h2>
-            <div className="w-12 h-[3px] bg-[#C9A227] mt-4 rounded-full"></div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* Review 1 */}
-            <div className="bg-[#f8f9fc] p-8 sm:p-10 rounded-lg border border-gray-150 relative shadow-sm">
-              <div className="flex gap-1 text-[#C9A227] mb-4">
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-              </div>
-              <p className="text-gray-600 text-sm sm:text-base leading-relaxed mb-6 italic">
-                &ldquo;The construction quality is absolutely top-notch, and the spacing between towers offers real privacy. The gated security makes it feel extremely safe.&rdquo;
-              </p>
-              <div>
-                <h4 className="font-bold text-navy text-sm sm:text-base">Anil Deshmukh</h4>
-                <p className="text-xs text-gray-400">IT Consultant, Infosys Mihan</p>
-              </div>
-            </div>
-
-            {/* Review 2 */}
-            <div className="bg-[#f8f9fc] p-8 sm:p-10 rounded-lg border border-gray-150 relative shadow-sm">
-              <div className="flex gap-1 text-[#C9A227] mb-4">
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-              </div>
-              <p className="text-gray-600 text-sm sm:text-base leading-relaxed mb-6 italic">
-                &ldquo;Excellent ventilation as the flats are open on 3 sides. Being just 5 minutes from AIIMS and close to the airport is a huge advantage.&rdquo;
-              </p>
-              <div>
-                <h4 className="font-bold text-navy text-sm sm:text-base">Priya Kulkarni</h4>
-                <p className="text-xs text-gray-400">Doctor, AIIMS Nagpur</p>
-              </div>
-            </div>
-
-            {/* Review 3 */}
-            <div className="bg-[#f8f9fc] p-8 sm:p-10 rounded-lg border border-gray-150 relative shadow-sm">
-              <div className="flex gap-1 text-[#C9A227] mb-4">
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-                <Star size={16} fill="#C9A227" />
-              </div>
-              <p className="text-gray-600 text-sm sm:text-base leading-relaxed mb-6 italic">
-                &ldquo;IJM&apos;s corporate reputation is why we invested. The payment schemes are transparent, and possession timelines are strictly followed.&rdquo;
-              </p>
-              <div>
-                <h4 className="font-bold text-navy text-sm sm:text-base">Ramesh Jha</h4>
-                <p className="text-xs text-gray-400">Investor, Mumbai</p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Contact + Footer Section - Navy gradient, noise overlay */}
-      <footer id="contact" className="bg-gradient-to-r from-[#0c162b] to-[#12213e] text-white pt-16 pb-24 border-t border-gold/10 relative noise-overlay">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-12 border-b border-white/10">
-            
-            {/* Left: Contact Info */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="w-16 h-12 bg-white/10 p-2 rounded-sm flex items-center justify-center">
-                <Image 
-                  src="/images/footer-logo.png" 
-                  alt="IJM Logo" 
-                  width={64}
-                  height={48}
-                  className="object-contain p-2"
-                />
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed max-w-sm">
-                First City Harmony is an premium development project located in the heart of Mihan, Nagpur, designed for standard living.
-              </p>
-              
-              <div className="space-y-4 text-sm text-gray-300">
-                <div className="flex items-start gap-3">
-                  <MapPin className="text-gold shrink-0 mt-1" size={18} />
-                  <span>IJM First City, Sector-20, MIHAN, Nagpur, Maharashtra - 441108</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="text-gold shrink-0" size={18} />
-                  <a href="tel:+91-9920511119" className="hover:text-gold transition-colors">+91-9920511119</a>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Mail className="text-gold shrink-0" size={18} />
-                  <a href="mailto:sales@firstcitynagpur.in" className="hover:text-gold transition-colors">sales@firstcitynagpur.in</a>
-                </div>
-              </div>
-            </div>
-
-            {/* Center: RERA barcodes */}
-            <div className="lg:col-span-3 space-y-4 text-center lg:text-left">
-              <h4 className="text-sm font-bold text-gold uppercase tracking-wider">MahaRERA Registration</h4>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Project registered under Maharashtra Real Estate Regulatory Authority. Scan codes to verify.
-              </p>
-              <div className="flex justify-center lg:justify-start gap-4">
-                <div className="w-20 h-20 bg-white p-1 rounded-sm flex items-center justify-center">
-                  <Image 
-                    src="/images/barcode1.png" 
-                    alt="RERA QR 1" 
-                    width={80}
-                    height={80}
-                    className="object-contain"
-                  />
-                </div>
-                <div className="w-20 h-20 bg-white p-1 rounded-sm flex items-center justify-center">
-                  <Image 
-                    src="/images/barcode2.png" 
-                    alt="RERA QR 2" 
-                    width={80}
-                    height={80}
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-              <p className="text-xs font-bold text-gray-300">MahaRERA Reg No: P50500049468 | P50500080409</p>
-            </div>
-
-            {/* Right: Map embed */}
-            <div className="lg:col-span-4 rounded-lg overflow-hidden border border-white/10 shadow-lg h-56 bg-gray-900">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.690397621467!2d79.03568347503189!3d21.04507048060831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd4bf55d2d8642b%3A0xcf8f6266e9755bf!2sFirst%20City!5e0!3m2!1sen!2sin!4v1761571621443!5m2!1sen!2sin" 
-                width="100%" 
-                height="100%" 
-                style={{ border: 0 }} 
-                allowFullScreen={true}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="opacity-80 hover:opacity-100 transition-opacity duration-300"
-              ></iframe>
-            </div>
-
-          </div>
-
-          <div className="pt-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-400">
-            <p>
-              © Copyright 2026 <span className="text-white font-semibold">Nagpur Integrated Township Pvt. Ltd. A SPV of IJM Group of Companies.</span> All Rights Reserved.
-            </p>
-            <div className="flex gap-4">
-              <a href="#" className="hover:text-gold transition-colors">Privacy Policy</a>
-              <span>•</span>
-              <a href="#" className="hover:text-gold transition-colors">Terms of Use</a>
-            </div>
-          </div>
-
-          {/* Legal Disclaimer text */}
-          <div className="mt-8 pt-4 border-t border-white/5 text-[10px] text-gray-500 leading-normal text-center sm:text-left">
-            <p>
-              Disclaimer: All information, images, pricing structure, layouts and specifications shown on this single-project landing page are sourced from reference materials and live websites of IJM First City. They are for marketing and lead generation representation purposes only. The official sales contract, developer cost sheets and verified MahaRERA files constitute the legal commitment. Standard terms and conditions apply.
-            </p>
-          </div>
-
-        </div>
-      </footer>
-
-      {/* Unified Floating Circular Action Buttons (WhatsApp & Call Symbols) */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col space-y-3">
-        <a 
-          href="https://wa.me/919920511119"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-14 h-14 bg-[#25D366] hover:bg-[#20ba5a] text-white flex items-center justify-center rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.4)] active:scale-95 hover:scale-105 transition-all duration-200"
-          aria-label="WhatsApp Chat"
-        >
-          <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-          </svg>
-        </a>
-        <a 
-          href="tel:+919920511119"
-          className="w-14 h-14 bg-[#C9A227] hover:bg-gold-light text-[#0a1128] flex items-center justify-center rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.4)] border border-gold/20 active:scale-95 hover:scale-105 transition-all duration-200"
-          aria-label="Call Sales"
-        >
-          <Phone size={22} className="text-[#0a1128]" />
-        </a>
-      </div>
-
-      {/* Enquiry Modal Popup */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-dark/80 backdrop-blur-sm transition-opacity duration-300">
-          <div className="relative bg-white w-full max-w-md rounded-lg shadow-2xl p-6 sm:p-8 border-t-4 border-gold animate-in fade-in zoom-in-95 duration-150">
-            <button 
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-navy hover:text-gold transition-colors"
-              aria-label="Close modal"
-            >
-              <X size={20} />
-            </button>
-
-            <div className="text-center mb-6">
-              <h3 className="text-xl sm:text-2xl font-bold text-navy">{modalTitle}</h3>
-              <p className="text-gray-500 text-xs sm:text-sm mt-1">Leave your details and our relationship manager will call back in 15 mins.</p>
-            </div>
-
-            <form onSubmit={handleModalSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-navy uppercase mb-1">Full Name*</label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                    <User size={16} />
-                  </span>
-                  <input 
-                    type="text" 
-                    required
-                    value={modalForm.name}
-                    onChange={(e) => setModalForm({...modalForm, name: e.target.value})}
-                    placeholder="John Doe" 
-                    className={`w-full pl-9 pr-3 py-2 bg-gray-50 border ${errors.name ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:border-gold text-sm text-navy`}
-                  />
-                </div>
-                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-navy uppercase mb-1">Phone Number*</label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                    <span className="text-xs font-bold font-sans">+91</span>
-                  </span>
-                  <input 
-                    type="tel" 
-                    required
-                    value={modalForm.phone}
-                    onChange={(e) => setModalForm({...modalForm, phone: e.target.value})}
-                    placeholder="10-digit Mobile" 
-                    className={`w-full pl-12 pr-3 py-2 bg-gray-50 border ${errors.phone ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:border-gold text-sm text-navy`}
-                  />
-                </div>
-                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-navy uppercase mb-1">Email Address*</label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                    <Mail size={16} />
-                  </span>
-                  <input 
-                    type="email" 
-                    required
-                    value={modalForm.email}
-                    onChange={(e) => setModalForm({...modalForm, email: e.target.value})}
-                    placeholder="name@domain.com" 
-                    className={`w-full pl-9 pr-3 py-2 bg-gray-50 border ${errors.email ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:border-gold text-sm text-navy`}
-                  />
-                </div>
-                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-navy uppercase mb-1">Interested BHK</label>
-                <select 
-                  value={modalForm.config}
-                  onChange={(e) => setModalForm({...modalForm, config: e.target.value})}
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-gold text-sm text-navy"
-                >
-                  <option value="2 BHK">2 BHK Apartments</option>
-                  <option value="2.5 BHK">2.5 BHK Apartments</option>
-                  <option value="3 BHK">3 BHK Apartments</option>
-                  <option value="3.5 BHK">3.5 BHK Premium</option>
-                </select>
-              </div>
-
-              <div className="flex items-start text-[10px] sm:text-xs text-gray-500 leading-normal gap-2 pt-1">
-                <input type="checkbox" defaultChecked className="mt-0.5 border-gray-300 rounded text-gold focus:ring-gold" required />
-                <span>I authorize Nagpur Integrated Township Private Limited to contact me, overriding DNC/NDNC registration.</span>
-              </div>
-
-              <div className="flex gap-4">
-                <button 
-                  type="submit" 
-                  className="w-full bg-[#C9A227] hover:bg-gold-light text-[#1a2744] font-extrabold py-3.5 px-4 rounded-lg transition-all duration-300 shadow-md uppercase tracking-wider text-xs sm:text-sm"
-                >
-                  Submit Enquiry
-                </button>
-              </div>
+              <Magnet><button type="submit" className="pill-btn pill-btn-gold w-full py-3.5 text-xs">Submit Enquiry</button></Magnet>
+              <p className="text-[9px] text-[#f5f0e8]/30 text-center">I authorize NITPL to contact me, overriding DNC/NDNC.</p>
             </form>
           </div>
         </div>
       )}
 
-      {/* Success Modal Popup */}
+      {/* ═══════ SUCCESS MODAL ═══════ */}
       {showSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-dark/85 backdrop-blur-md">
-          <div className="bg-white w-full max-w-sm rounded-lg shadow-2xl p-6 sm:p-8 border-t-4 border-green-500 text-center animate-in fade-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-500 mx-auto mb-4">
-              <CheckCircle size={36} />
-            </div>
-            <h3 className="text-2xl font-extrabold text-navy mb-2">Thank You!</h3>
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">
-              Our team has received your enquiry. One of our dedicated property relationship managers will contact you shortly with the customized pricing sheet and details.
-            </p>
-            <button 
-              onClick={() => setShowSuccess(false)}
-              className="w-full bg-[#1a2744] hover:bg-[#151f35] text-white font-bold py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm tracking-widest uppercase"
-            >
-              Back to site
-            </button>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+          <div className="glass w-full max-w-sm rounded-2xl p-8 text-center neu-shadow border-t-2 border-t-green-500">
+            <div className="w-16 h-16 bg-green-950/50 border border-green-500/20 rounded-full flex items-center justify-center text-green-500 mx-auto mb-4"><CheckCircle size={36} /></div>
+            <h3 className="text-2xl font-serif font-bold text-white mb-2">Thank You!</h3>
+            <p className="text-[#f5f0e8]/50 text-xs leading-relaxed mb-6">Our property relationship manager will contact you shortly with pricing details.</p>
+            <button onClick={() => setShowSuccess(false)} className="pill-btn pill-btn-gold w-full py-3">Back to Site</button>
           </div>
         </div>
       )}

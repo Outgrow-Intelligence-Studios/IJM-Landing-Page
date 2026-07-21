@@ -8,18 +8,23 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        serif: ["var(--font-cormorant)", "serif"],
+        sans: ["var(--font-jost)", "sans-serif"],
+      },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "var(--bg-primary)",
+        foreground: "var(--cream)",
         navy: {
-          DEFAULT: "#1a2744",
-          dark: "#0e1628",
-          light: "#2a3b61",
+          DEFAULT: "#120f0f",
+          dark: "#0a0808",
+          light: "#1c1714",
         },
         gold: {
-          DEFAULT: "#C9A227",
-          light: "#e5be41",
-          dark: "#a5811c",
+          DEFAULT: "#b8924a",
+          light: "#d4af70",
+          shimmer: "#f0d080",
+          dark: "#a37f3b",
         },
       },
     },
