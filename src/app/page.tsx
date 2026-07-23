@@ -475,14 +475,14 @@ export default function LandingPage() {
       </section>
 
       {/* ═══════ RECOMMENDED PROPERTIES — ASYMMETRIC GRID (Landscape renders) ═══════ */}
-      <section id="amenities" className="py-20 sm:py-28 bg-[#151515] relative">
+      <section id="amenities" className="pt-20 pb-10 sm:pt-28 sm:pb-16 bg-[#151515] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="gsap-fade-up text-center mb-14">
             <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
               <ShinyText text="RESORT LIVING" color="#C29B57" shineColor="#f5f0e8" speed={3} />
             </span>
             <h2 className="text-3xl sm:text-4xl font-serif font-light text-white">
-              <BlurText text="World-Class Amenities" delay={80} animateBy="words" direction="bottom" />
+              <BlurText text="100+ World-Class Amenities" delay={80} animateBy="words" direction="bottom" />
             </h2>
             <div className="h-px bg-[#C29B57] w-16 mx-auto mt-4"></div>
           </div>
@@ -497,9 +497,9 @@ export default function LandingPage() {
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src={RENDERS.gym} alt="Outdoor Gym" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src={RENDERS.gym} alt="Indoor Gym" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
-                <span className="text-white font-serif text-sm font-bold">Outdoor Gym</span>
+                <span className="text-white font-serif text-sm font-bold">Indoor Gym</span>
               </div>
             </GlareHover>
 
@@ -537,12 +537,6 @@ export default function LandingPage() {
                 <span className="text-white font-serif text-sm font-bold">Kids Play Area</span>
               </div>
             </GlareHover>
-          </div>
-
-          <div className="gsap-fade-up mt-12 text-center">
-            <Magnet>
-              <button onClick={() => openEnquiryModal("Request full amenity list", "2.5 BHK")} className="pill-btn pill-btn-outline">View All 100+ Amenities</button>
-            </Magnet>
           </div>
         </div>
       </section>
