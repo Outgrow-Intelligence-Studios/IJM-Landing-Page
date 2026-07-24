@@ -403,7 +403,7 @@ export default function LandingPage() {
             </div>
 
             <div className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src={RENDERS.bedroom} alt="Premium Bedroom Interior" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src={RENDERS.elevationBlock} alt="Smart Layouts" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/80 to-transparent z-[1] flex items-end p-4">
                 <div>
                   <Maximize2 size={18} className="text-[#b8924a] mb-1" />
@@ -490,51 +490,72 @@ export default function LandingPage() {
           <div className="stagger-container asym-grid">
             {/* Featured — large card */}
             <GlareHover className="stagger-item card-featured luxury-card rounded-xl overflow-hidden relative group">
-              <Image src={RENDERS.chitChat} alt="Chit Chat Park" fill className="object-cover" sizes="(max-width:768px) 100vw, 66vw" loading="lazy" quality={60} />
+              <Image src="/images/amenities/swimming_pool.png" alt="Swimming Pool" fill className="object-cover" sizes="(max-width:768px) 100vw, 66vw" loading="lazy" quality={60} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-6">
-                <span className="text-white font-serif text-lg font-bold">Chit-Chat Park</span>
+                <span className="text-white font-serif text-lg font-bold">Swimming Pool</span>
               </div>
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src={RENDERS.gym} alt="Indoor Gym" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/gymnasium.png" alt="Modern Gymnasium" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
-                <span className="text-white font-serif text-sm font-bold">Indoor Gym</span>
+                <span className="text-white font-serif text-sm font-bold">Modern Gymnasium</span>
               </div>
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src={RENDERS.cricket} alt="Box Cricket Pitch" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/sauna.png" alt="Sauna" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Sauna</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src="/images/amenities/steam_room.png" alt="Steam Room" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Steam Room</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src="/images/amenities/spa.png" alt="Spa" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Spa</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src="/images/amenities/badminton.png" alt="Indoor Badminton Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Indoor Badminton Court</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src="/images/amenities/squash.png" alt="Squash Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Squash Court</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src="/images/amenities/tennis.png" alt="Tennis Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
+                <span className="text-white font-serif text-sm font-bold">Tennis Court</span>
+              </div>
+            </GlareHover>
+
+            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src="/images/amenities/cricket.png" alt="Box Cricket Pitch" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
                 <span className="text-white font-serif text-sm font-bold">Box Cricket Pitch</span>
               </div>
             </GlareHover>
 
-            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src={RENDERS.multiSport} alt="Multi-Sport Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+            <GlareHover className="stagger-item col-span-2 md:col-span-3 luxury-card rounded-xl overflow-hidden relative group h-[200px]">
+              <Image src="/images/amenities/jacuzzi.png" alt="Jacuzzi" fill className="object-cover" sizes="100vw" loading="lazy" quality={55} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
-                <span className="text-white font-serif text-sm font-bold">Multi-Sport Court</span>
-              </div>
-            </GlareHover>
-
-            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src={RENDERS.miyawaki} alt="Miyawaki Forest" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
-              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
-                <span className="text-white font-serif text-sm font-bold">Miyawaki Forest</span>
-              </div>
-            </GlareHover>
-
-            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src={RENDERS.library} alt="Outdoor Library" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
-              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
-                <span className="text-white font-serif text-sm font-bold">Outdoor Library</span>
-              </div>
-            </GlareHover>
-
-            <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src={RENDERS.childPlay} alt="Children Play Area" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
-              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
-                <span className="text-white font-serif text-sm font-bold">Kids Play Area</span>
+                <span className="text-white font-serif text-sm font-bold">Jacuzzi</span>
               </div>
             </GlareHover>
           </div>
@@ -556,11 +577,11 @@ export default function LandingPage() {
 
           <div className="stagger-container grid grid-cols-1 md:grid-cols-2 gap-6">
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[280px] sm:h-[380px]">
-              <Image src="/renders/interiors/dining-area.jpg" alt="Elegant Dining Area" fill className="object-cover object-center" sizes="(max-width:768px) 100vw, 50vw" loading="lazy" quality={60} />
+              <Image src={RENDERS.elevation} alt="Superior Wall Finish" fill className="object-cover object-center" sizes="(max-width:768px) 100vw, 50vw" loading="lazy" quality={60} />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0808]/80 to-transparent z-[1] flex items-end p-6">
                 <div>
-                  <h3 className="text-lg font-serif font-bold text-white">Dining Area</h3>
-                  <p className="text-[#f5f0e8]/50 text-xs mt-1">Elegant spaces crafted for every gathering</p>
+                  <h3 className="text-lg font-serif font-bold text-white">Superior Wall Finish</h3>
+                  <p className="text-[#f5f0e8]/50 text-xs mt-1">Premium wall finishes crafted for durability, elegance, and a luxurious living experience.</p>
                 </div>
               </div>
             </GlareHover>
@@ -746,11 +767,11 @@ export default function LandingPage() {
               <h3 className="text-xl font-serif text-white mb-6">From First City</h3>
               <div className="space-y-0 divide-y divide-white/5">
                 {[
-                  { name: "Infosys", dist: "3 Mins" },
-                  { name: "AIIMS", dist: "5 Mins" },
-                  { name: "TCS", dist: "7 Mins" },
-                  { name: "Nagpur Intl Airport", dist: "12 Mins" },
-                  { name: "Nagpur Railway Stn", dist: "20 Mins" },
+                  { name: "IT Hub", dist: "3 Mins" },
+                  { name: "Educational Institutions", dist: "3 Mins" },
+                  { name: "Hospitals", dist: "5 Mins" },
+                  { name: "Metro", dist: "5 Mins" },
+                  { name: "Airport", dist: "10 Mins" },
                 ].map((item) => (
                   <div key={item.name} className="py-3.5 flex justify-between items-center">
                     <div className="flex items-center gap-3">
