@@ -490,7 +490,7 @@ export default function LandingPage() {
           <div className="stagger-container asym-grid">
             {/* Featured — large card */}
             <GlareHover className="stagger-item card-featured luxury-card rounded-xl overflow-hidden relative group">
-              <Image src="/images/amenities/swimming_pool.png" alt="Swimming Pool" fill className="object-cover" sizes="(max-width:768px) 100vw, 66vw" loading="lazy" quality={60} />
+              <Image src="/images/amenities/swimming_pool.jpg" alt="Swimming Pool" fill className="object-cover" sizes="(max-width:768px) 100vw, 66vw" loading="lazy" quality={60} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-6">
                 <span className="text-white font-serif text-lg font-bold">Swimming Pool</span>
               </div>
@@ -546,7 +546,7 @@ export default function LandingPage() {
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/cricket.png" alt="Box Cricket Pitch" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/cricket.jpg" alt="Box Cricket Pitch" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
                 <span className="text-white font-serif text-sm font-bold">Box Cricket Pitch</span>
               </div>
@@ -741,7 +741,7 @@ export default function LandingPage() {
                   <Magnet><button onClick={() => openEnquiryModal("3 BHK Floor Plan", "3 BHK")} className="pill-btn pill-btn-outline mt-4">Enquire Now</button></Magnet>
                 </div>
                 <div className="lg:w-1/2 relative w-full h-60 sm:h-[380px] bg-[#f0eeeb] rounded-xl border border-[#C29B57]/10 overflow-hidden">
-                  <Image src="/images/Harmony6.png" alt="3 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
+                  <Image src="/images/Floor-Plan.png" alt="3 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
                 </div>
               </>
             )}
