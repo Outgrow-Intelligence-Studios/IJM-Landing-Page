@@ -796,64 +796,205 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══════ ABOUT & TESTIMONIALS ═══════ */}
-      <section className="py-20 sm:py-28 bg-[#FAF9F6] relative">
+      {/* ═══════ CORPORATE TRUST & LEGACY (About IJM India) ═══════ */}
+      <section className="py-20 sm:py-28 bg-[#FAF9F6] relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="gsap-fade-up grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-            <div className="space-y-6 text-left">
-              <div className="flex items-center gap-2 text-[#C29B57] text-xs uppercase tracking-[0.2em] font-bold">
-                <Award size={16} />
-                <ShinyText text="BRAND HERITAGE" color="#C29B57" shineColor="#1A1A1A" speed={3} />
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-serif font-light text-[#1A1A1A]">About IJM Group</h2>
-              <div className="w-16 h-px bg-[#C29B57]"></div>
-              <p className="text-[#3a3a3a] text-sm leading-relaxed">NITPL delivers global engineering standards to Central India — high-quality residential spaces with a zero-delay delivery record.</p>
-              <div className="grid grid-cols-2 gap-6 pt-6 border-t border-[#1A1A1A]/10">
-                <div>
-                  <span className="text-3xl font-serif font-bold text-[#C29B57]"><CountUp to={35} from={0} suffix="+" /></span>
-                  <span className="block text-[9px] uppercase tracking-[0.2em] text-[#3a3a3a]/60 mt-1">Years in India</span>
+          
+          {/* Header */}
+          <div className="gsap-fade-up text-center mb-16">
+            <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
+              <ShinyText text="ABOUT IJM INDIA" color="#C29B57" shineColor="#1A1A1A" speed={3} />
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-light text-[#1A1A1A]">
+              About IJM India
+            </h2>
+            <p className="text-[#3a3a3a]/60 text-xs sm:text-sm mt-3 uppercase tracking-wider font-sans font-semibold">
+              Engineering Excellence. Global Legacy. Trusted Infrastructure.
+            </p>
+            <div className="h-px bg-[#C29B57] w-16 mx-auto mt-5"></div>
+          </div>
+
+          {/* Overview Grid */}
+          <div className="gsap-fade-up grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-24">
+            {/* Left Column - Company Profile */}
+            <div className="lg:col-span-7 space-y-6 text-left">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-20 h-12 bg-white p-2 rounded-xl flex items-center justify-center border border-[#C29B57]/15 shadow-sm">
+                  <Image src="/images/corporate/logo.png" alt="IJM India Logo" width={80} height={48} className="object-contain" />
                 </div>
                 <div>
-                  <span className="text-3xl font-serif font-bold text-[#C29B57]"><CountUp to={200} from={0} suffix="M+" /></span>
-                  <span className="block text-[9px] uppercase tracking-[0.2em] text-[#3a3a3a]/60 mt-1">Sq.Ft. Delivered</span>
+                  <h3 className="text-lg font-serif font-bold text-[#1A1A1A]">IJM (India) Infrastructure Limited</h3>
+                  <p className="text-[10px] text-[#C29B57] uppercase tracking-wider font-semibold">Excellence Through Quality</p>
                 </div>
               </div>
+              <p className="text-[#3a3a3a] text-sm leading-relaxed">
+                IJM (India) Infrastructure Limited (IJMII), incorporated in 1998, is a subsidiary of IJM Corporation Berhad — one of Malaysia&apos;s largest and most diversified construction groups. Over nearly three decades of operations in India, IJMII has established a sterling record as a pioneer in highway infrastructure and premium property development.
+              </p>
+              
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-[#3a3a3a] font-sans font-semibold">
+                <li className="flex items-start gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C29B57] mt-1.5 flex-shrink-0"></span>
+                  <span>Subsidiary of IJM Corporation Berhad, Malaysia</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C29B57] mt-1.5 flex-shrink-0"></span>
+                  <span>Established Indian operations in 1998</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C29B57] mt-1.5 flex-shrink-0"></span>
+                  <span>Global infrastructure & construction expertise</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C29B57] mt-1.5 flex-shrink-0"></span>
+                  <span>Residential, commercial & highway development</span>
+                </li>
+              </ul>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm border border-[#C29B57]/15 rounded-2xl p-8 space-y-5 shadow-lg">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-10 bg-[#FAF9F6] p-2 rounded-lg flex items-center justify-center border border-[#C29B57]/20">
-                  <Image src="/images/ijm_logo.png" alt="IJM Logo" width={56} height={40} className="object-contain" />
+
+            {/* Right Column - Stats Grid */}
+            <div className="lg:col-span-5 grid grid-cols-2 gap-4">
+              {[
+                { value: "40+", suffix: " Years", desc: "Global Group Excellence" },
+                { value: "5500+", suffix: " Lane Km", desc: "Highways & Bridges Built" },
+                { value: "20.2", suffix: "M Sq.Ft.", desc: "Residential & Commercial" },
+                { value: "9+", suffix: " Countries", desc: "Worldwide Operations Presence" }
+              ].map((stat, i) => (
+                <div key={i} className="bg-white/80 backdrop-blur-sm border border-[#C29B57]/15 rounded-xl p-5 shadow-sm text-center">
+                  <span className="text-2xl sm:text-3xl font-serif font-bold text-[#C29B57] block">
+                    {stat.value.includes(".") ? (
+                      <span className="font-serif font-bold">{stat.value}{stat.suffix}</span>
+                    ) : (
+                      <span className="font-serif font-bold"><CountUp to={parseInt(stat.value)} from={0} suffix={stat.suffix} /></span>
+                    )}
+                  </span>
+                  <span className="block text-[9px] uppercase tracking-[0.15em] text-[#3a3a3a]/60 mt-2 font-sans font-bold leading-normal">
+                    {stat.desc}
+                  </span>
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-[#1A1A1A]">Nagpur Integrated Township Pvt. Ltd.</h4>
-                  <p className="text-[10px] text-[#3a3a3a]/60 uppercase tracking-wider">A SPV of IJM Group</p>
-                </div>
-              </div>
-              <p className="text-[#3a3a3a] text-xs leading-relaxed">Decades of engineering precision and zero-delay delivery make IJM First City one of the safest property investments in Central India.</p>
+              ))}
             </div>
           </div>
 
-          {/* Testimonials */}
-          <div className="gsap-fade-up text-center mb-12">
-            <h3 className="text-2xl font-serif font-light text-[#1A1A1A]">What Buyers Say</h3>
-            <div className="h-px bg-[#C29B57] w-12 mx-auto mt-3"></div>
+          {/* Awards & Recognition Subsection */}
+          <div className="gsap-fade-up mb-24">
+            <div className="text-center mb-12">
+              <span className="text-[#C29B57] font-sans font-bold text-[9px] uppercase tracking-[0.25em] block mb-1">HONORS</span>
+              <h3 className="text-xl sm:text-2xl font-serif font-light text-[#1A1A1A]">Awards & Recognition</h3>
+              <div className="h-px bg-[#C29B57] w-12 mx-auto mt-2"></div>
+            </div>
+            
+            <div className="stagger-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { 
+                  img: "/images/corporate/cidc_managed.jpg", 
+                  title: "Best Professionally Managed Company", 
+                  desc: "Conferred trophy by CIDC during the prestigious CIDC Vishwakarma Awards." 
+                },
+                { 
+                  img: "/images/corporate/cidc_project.jpg", 
+                  title: "Best Construction Project", 
+                  desc: "Awarded achievement honor for the Solapur-Bijapur national road project." 
+                },
+                { 
+                  img: "/images/corporate/chairman_commendation.jpg", 
+                  title: "Chairman's Commendation Trophy", 
+                  desc: "Presented by the Construction Industry Development Council (CIDC) of India." 
+                },
+                { 
+                  img: "/images/corporate/morth_appreciation.jpg", 
+                  title: "MoRTH Certificate of Appreciation", 
+                  desc: "Awarded by Hon'ble Union Minister Nitin Gadkari for setting paving records." 
+                },
+                { 
+                  img: "/images/corporate/india_records.jpg", 
+                  title: "India Book of Records", 
+                  desc: "Custodian registry for laying bituminous concrete over 25.54 lane-km in 18 hours." 
+                },
+                { 
+                  img: "/images/corporate/asia_records.jpg", 
+                  title: "Asia Book of Records", 
+                  desc: "Official entry into transnational record list complying with international protocols." 
+                }
+              ].map((award, i) => (
+                <GlareHover key={i} className="stagger-item bg-white border border-[#C29B57]/15 rounded-xl overflow-hidden shadow-sm hover:shadow-md flex flex-col h-full">
+                  <div className="relative h-48 w-full bg-[#FAF9F6] border-b border-[#C29B57]/10 flex items-center justify-center p-4">
+                    <Image src={award.img} alt={award.title} fill className="object-contain p-3" sizes="(max-width:768px) 100vw, 33vw" loading="lazy" />
+                  </div>
+                  <div className="p-5 flex flex-col flex-grow justify-between text-left">
+                    <h4 className="text-xs sm:text-sm font-serif font-bold text-[#1A1A1A] leading-tight mb-2">{award.title}</h4>
+                    <p className="text-[#3a3a3a]/70 text-[10px] leading-relaxed font-sans">{award.desc}</p>
+                  </div>
+                </GlareHover>
+              ))}
+            </div>
           </div>
-          <div className="stagger-container grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { quote: "Construction quality is top-notch, gated security makes it feel safe.", name: "Anil Deshmukh", role: "IT Consultant, Infosys" },
-              { quote: "Excellent 3-side ventilation and proximity to AIIMS and the airport.", name: "Priya Kulkarni", role: "Doctor, AIIMS Nagpur" },
-              { quote: "Unmatched developer credibility with strict possession timelines.", name: "Ramesh Jha", role: "Investor, Mumbai" },
-            ].map((t) => (
-              <GlareHover key={t.name} className="stagger-item bg-white/80 backdrop-blur-sm border border-[#C29B57]/15 rounded-xl p-6 sm:p-8 text-left shadow-md">
-                <div className="flex gap-0.5 text-[#C29B57] mb-4">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={13} fill="#C29B57" stroke="none" />)}
+
+          {/* Certifications Subsection */}
+          <div className="gsap-fade-up mb-24">
+            <div className="text-center mb-12">
+              <span className="text-[#C29B57] font-sans font-bold text-[9px] uppercase tracking-[0.25em] block mb-1">STANDARDS</span>
+              <h3 className="text-xl sm:text-2xl font-serif font-light text-[#1A1A1A]">Corporate Certifications</h3>
+              <div className="h-px bg-[#C29B57] w-12 mx-auto mt-2"></div>
+            </div>
+            
+            <div className="stagger-container grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { img: "/images/corporate/iso_cert.png", title: "ISO 9001:2015", desc: "QMS Certification" },
+                { img: "/images/corporate/limca_records.jpg", title: "Limca Book of Records", desc: "National Paving Record" },
+                { img: "/images/corporate/service_52.jpg", title: "TCS Safety Certificate", desc: "Outstanding Safety Compliance" },
+                { img: "/images/corporate/service_53.jpg", title: "CIDC Affiliate Membership", desc: "Industry Council Alliance" }
+              ].map((cert, i) => (
+                <div key={i} className="stagger-item bg-white border border-[#C29B57]/15 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 text-center flex flex-col justify-between items-center h-full">
+                  <div className="relative h-28 w-28 bg-[#FAF9F6] rounded-lg border border-[#C29B57]/10 flex items-center justify-center p-2 mb-3">
+                    <Image src={cert.img} alt={cert.title} fill className="object-contain p-2" sizes="120px" loading="lazy" />
+                  </div>
+                  <div>
+                    <h4 className="text-[11px] font-bold text-[#1A1A1A] leading-tight">{cert.title}</h4>
+                    <p className="text-[#3a3a3a]/60 text-[9px] mt-1 font-sans font-medium">{cert.desc}</p>
+                  </div>
                 </div>
-                <p className="text-[#3a3a3a] text-xs sm:text-sm italic mb-5">&ldquo;{t.quote}&rdquo;</p>
-                <h4 className="text-sm font-bold text-[#1A1A1A]">{t.name}</h4>
-                <p className="text-[9px] text-[#3a3a3a]/60 uppercase tracking-wider mt-0.5">{t.role}</p>
-              </GlareHover>
-            ))}
+              ))}
+            </div>
           </div>
+
+          {/* Mission & Values Subsection */}
+          <div className="gsap-fade-up">
+            <div className="text-center mb-12">
+              <span className="text-[#C29B57] font-sans font-bold text-[9px] uppercase tracking-[0.25em] block mb-1">CULTURE</span>
+              <h3 className="text-xl sm:text-2xl font-serif font-light text-[#1A1A1A]">Mission & Values</h3>
+              <div className="h-px bg-[#C29B57] w-12 mx-auto mt-2"></div>
+            </div>
+            
+            <div className="stagger-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { 
+                  title: "Integrity", 
+                  desc: "Upholding the highest moral standards, transparency, and honesty in all actions to maintain institutional trust." 
+                },
+                { 
+                  title: "Teamwork", 
+                  desc: "Harnessing the combined synergy, diverse perspectives, and operational alignment of all divisions." 
+                },
+                { 
+                  title: "Innovation", 
+                  desc: "Pioneering state-of-the-art engineering solutions, advanced modern machinery, and forward-looking concepts." 
+                },
+                { 
+                  title: "Customer Focus", 
+                  desc: "Customer satisfaction drives our excellence. We prioritize delivering long-term value, quality construction, and strict timeline adherence." 
+                }
+              ].map((value, i) => (
+                <div key={i} className="stagger-item bg-white border border-[#C29B57]/15 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 text-left flex flex-col justify-between h-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-lg font-serif font-bold text-[#C29B57]">0{i + 1}</span>
+                    <h4 className="text-sm font-serif font-bold text-[#1A1A1A]">{value.title}</h4>
+                  </div>
+                  <p className="text-[#3a3a3a]/80 text-[11px] leading-relaxed font-sans font-medium flex-grow">{value.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 
