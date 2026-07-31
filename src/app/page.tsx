@@ -525,9 +525,9 @@ export default function LandingPage() {
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/badminton.png" alt="Indoor Badminton Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/jacuzzi.jpg" alt="Jacuzzi" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
-                <span className="text-white font-serif text-sm font-bold">Indoor Badminton Court</span>
+                <span className="text-white font-serif text-sm font-bold">Jacuzzi</span>
               </div>
             </GlareHover>
 
@@ -552,12 +552,7 @@ export default function LandingPage() {
               </div>
             </GlareHover>
 
-            <GlareHover className="stagger-item col-span-2 md:col-span-3 luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/jacuzzi.jpg" alt="Jacuzzi" fill className="object-cover" sizes="100vw" loading="lazy" quality={55} />
-              <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
-                <span className="text-white font-serif text-sm font-bold">Jacuzzi</span>
-              </div>
-            </GlareHover>
+
           </div>
         </div>
       </section>
