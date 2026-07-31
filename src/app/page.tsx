@@ -929,68 +929,51 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Certifications Subsection */}
-          <div className="gsap-fade-up mb-24">
-            <div className="text-center mb-12">
-              <span className="text-[#C29B57] font-sans font-bold text-[9px] uppercase tracking-[0.25em] block mb-1">STANDARDS</span>
-              <h3 className="text-xl sm:text-2xl font-serif font-light text-[#1A1A1A]">Corporate Certifications</h3>
-              <div className="h-px bg-[#C29B57] w-12 mx-auto mt-2"></div>
-            </div>
-            
-            <div className="stagger-container grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { img: "/images/corporate/iso_cert.png", title: "ISO 9001:2015", desc: "QMS Certification" },
-                { img: "/images/corporate/limca_records.jpg", title: "Limca Book of Records", desc: "National Paving Record" },
-                { img: "/images/corporate/service_52.jpg", title: "TCS Safety Certificate", desc: "Outstanding Safety Compliance" },
-                { img: "/images/corporate/service_53.jpg", title: "CIDC Affiliate Membership", desc: "Industry Council Alliance" }
-              ].map((cert, i) => (
-                <div key={i} className="stagger-item bg-white border border-[#C29B57]/15 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 text-center flex flex-col justify-between items-center h-full">
-                  <div className="relative h-28 w-28 bg-[#FAF9F6] rounded-lg border border-[#C29B57]/10 flex items-center justify-center p-2 mb-3">
-                    <Image src={cert.img} alt={cert.title} fill className="object-contain p-2" sizes="120px" loading="lazy" />
-                  </div>
-                  <div>
-                    <h4 className="text-[11px] font-bold text-[#1A1A1A] leading-tight">{cert.title}</h4>
-                    <p className="text-[#3a3a3a]/60 text-[9px] mt-1 font-sans font-medium">{cert.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Mission & Values Subsection */}
+          {/* Customer Testimonials Subsection */}
           <div className="gsap-fade-up">
             <div className="text-center mb-12">
-              <span className="text-[#C29B57] font-sans font-bold text-[9px] uppercase tracking-[0.25em] block mb-1">CULTURE</span>
-              <h3 className="text-xl sm:text-2xl font-serif font-light text-[#1A1A1A]">Mission & Values</h3>
+              <span className="text-[#C29B57] font-sans font-bold text-[9px] uppercase tracking-[0.25em] block mb-1">REVIEWS</span>
+              <h3 className="text-xl sm:text-2xl font-serif font-light text-[#1A1A1A]">Customer Testimonials</h3>
               <div className="h-px bg-[#C29B57] w-12 mx-auto mt-2"></div>
             </div>
             
-            <div className="stagger-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="stagger-container grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
                 { 
-                  title: "Integrity", 
-                  desc: "Upholding the highest moral standards, transparency, and honesty in all actions to maintain institutional trust." 
+                  img: "/images/testimonials/nagdeve.jpg", 
+                  name: "Mr. & Mrs. Nagdeve", 
+                  text: "Choosing Harmony Tower felt right from the beginning. The clarity in communication, thoughtful planning, and overall vision of the project gave us complete confidence. We're really looking forward to building our life here." 
                 },
                 { 
-                  title: "Teamwork", 
-                  desc: "Harnessing the combined synergy, diverse perspectives, and operational alignment of all divisions." 
+                  img: "/images/testimonials/kaner.jpg", 
+                  name: "Mr. Yash Kaner", 
+                  text: "Buying a home is a big milestone, and First City made it truly special for us. Beyond just a home, it offers the lifestyle upgrade we were looking for—with thoughtful design, great amenities, and a location that perfectly fits our vision of a dream home." 
                 },
                 { 
-                  title: "Innovation", 
-                  desc: "Pioneering state-of-the-art engineering solutions, advanced modern machinery, and forward-looking concepts." 
+                  img: "/images/testimonials/gadkari.jpg", 
+                  name: "Mr. & Mrs. Gadkari", 
+                  text: "From our very first visit, First City gave us a sense of trust. Seeing a well-developed township with a growing community and quality infrastructure made our decision much easier. Today, we're happy to be part of a place that offers both a comfortable lifestyle and strong long-term value." 
                 },
                 { 
-                  title: "Customer Focus", 
-                  desc: "Customer satisfaction drives our excellence. We prioritize delivering long-term value, quality construction, and strict timeline adherence." 
+                  img: "/images/testimonials/singh.jpg", 
+                  name: "Mr. & Mrs. Singh", 
+                  text: "A home is more than four walls, and that's exactly what we found at First City. The peaceful environment, well-planned spaces, and vibrant township feeling made it easy for us to imagine our future here." 
                 }
-              ].map((value, i) => (
-                <div key={i} className="stagger-item bg-white border border-[#C29B57]/15 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 text-left flex flex-col justify-between h-full">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-lg font-serif font-bold text-[#C29B57]">0{i + 1}</span>
-                    <h4 className="text-sm font-serif font-bold text-[#1A1A1A]">{value.title}</h4>
+              ].map((item, i) => (
+                <GlareHover key={i} className="stagger-item bg-white border border-[#C29B57]/15 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row gap-6 items-center sm:items-start text-left shadow-sm hover:shadow-md transition-all duration-300 h-full">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-[#C29B57]/20 flex-shrink-0 shadow-inner">
+                    <Image src={item.img} alt={item.name} fill className="object-cover" sizes="96px" loading="lazy" />
                   </div>
-                  <p className="text-[#3a3a3a]/80 text-[11px] leading-relaxed font-sans font-medium flex-grow">{value.desc}</p>
-                </div>
+                  <div className="flex flex-col justify-between flex-grow h-full space-y-3">
+                    <div className="space-y-1">
+                      <div className="flex gap-0.5 text-[#C29B57] mb-1">
+                        {[...Array(5)].map((_, idx) => <Star key={idx} size={11} fill="#C29B57" stroke="none" />)}
+                      </div>
+                      <h4 className="text-sm font-serif font-bold text-[#1A1A1A]">{item.name}</h4>
+                    </div>
+                    <p className="text-[#3a3a3a]/80 text-xs sm:text-[13px] leading-relaxed italic font-sans font-medium">&ldquo;{item.text}&rdquo;</p>
+                  </div>
+                </GlareHover>
               ))}
             </div>
           </div>
