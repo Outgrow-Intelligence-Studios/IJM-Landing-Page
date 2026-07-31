@@ -539,9 +539,9 @@ export default function LandingPage() {
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/tennis.png" alt="Tennis Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/multisport.jpg" alt="Multi-Sport Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
-                <span className="text-white font-serif text-sm font-bold">Tennis Court</span>
+                <span className="text-white font-serif text-sm font-bold">Multi-Sport Court</span>
               </div>
             </GlareHover>
 
