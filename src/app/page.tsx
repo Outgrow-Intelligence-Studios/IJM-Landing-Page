@@ -707,7 +707,7 @@ export default function LandingPage() {
                   <Magnet><button onClick={() => openEnquiryModal("2 BHK Floor Plan", "2 BHK")} className="pill-btn pill-btn-outline mt-4">Enquire Now</button></Magnet>
                 </div>
                 <div className="lg:w-1/2 relative w-full h-60 sm:h-[380px] bg-[#f0eeeb] rounded-xl border border-[#C29B57]/10 overflow-hidden">
-                  <Image src="/images/Typical-Floor-Plan.png" alt="2 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
+                  <Image src="/images/Typical-Floor-Plan-v2.png" alt="2 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
                 </div>
               </>
             )}
@@ -724,7 +724,7 @@ export default function LandingPage() {
                   <Magnet><button onClick={() => openEnquiryModal("2.5 BHK Floor Plan", "2.5 BHK")} className="pill-btn pill-btn-outline mt-4">Enquire Now</button></Magnet>
                 </div>
                 <div className="lg:w-1/2 relative w-full h-60 sm:h-[380px] bg-[#f0eeeb] rounded-xl border border-[#C29B57]/10 overflow-hidden">
-                  <Image src="/images/Floor-Plan.png" alt="2.5 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
+                  <Image src="/images/Floor-Plan-v2.png" alt="2.5 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
                 </div>
               </>
             )}
@@ -741,7 +741,7 @@ export default function LandingPage() {
                   <Magnet><button onClick={() => openEnquiryModal("3 BHK Floor Plan", "3 BHK")} className="pill-btn pill-btn-outline mt-4">Enquire Now</button></Magnet>
                 </div>
                 <div className="lg:w-1/2 relative w-full h-60 sm:h-[380px] bg-[#f0eeeb] rounded-xl border border-[#C29B57]/10 overflow-hidden">
-                  <Image src="/images/3bhk-Floor-Plan.png" alt="3 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
+                  <Image src="/images/3bhk-Floor-Plan-v2.png" alt="3 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
                 </div>
               </>
             )}
