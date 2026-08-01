@@ -740,6 +740,32 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ═══════ BOOK SITE VISIT ═══════ */}
+      <section className="py-20 sm:py-28 bg-[#151515] relative">
+        <div className="max-w-md mx-auto px-4 sm:px-6">
+          <div className="gsap-fade-up glass rounded-2xl overflow-hidden neu-shadow p-8">
+            <div className="space-y-4 text-center mb-8">
+              <span className="text-[#b8924a] font-bold text-[10px] uppercase tracking-[0.3em]">By Appointment</span>
+              <h3 className="text-2xl font-serif font-light text-white">Book Site Visit</h3>
+              <div className="w-12 h-px bg-[#b8924a] mx-auto"></div>
+              <p className="text-[#f5f0e8]/50 text-xs leading-relaxed">Schedule a private tour of MIHAN location.</p>
+            </div>
+            <form onSubmit={handleVisitSubmit} className="space-y-4">
+              <input type="text" required value={visitForm.name} onChange={(e) => setVisitForm({...visitForm, name: e.target.value})} placeholder="Full Name" className={`form-input ${errors.name ? "!border-red-500" : ""}`} />
+              <input type="tel" required value={visitForm.phone} onChange={(e) => setVisitForm({...visitForm, phone: e.target.value})} placeholder="Phone Number" className={`form-input ${errors.phone ? "!border-red-500" : ""}`} />
+              <input type="email" required value={visitForm.email} onChange={(e) => setVisitForm({...visitForm, email: e.target.value})} placeholder="Email Address" className={`form-input ${errors.email ? "!border-red-500" : ""}`} />
+              <select value={visitForm.config} onChange={(e) => setVisitForm({...visitForm, config: e.target.value})} className="form-input">
+                <option value="2 BHK">2 BHK</option>
+                <option value="2.5 BHK">2.5 BHK</option>
+                <option value="3 BHK">3 BHK</option>
+              </select>
+              <div className="text-center"><Magnet><button type="submit" className="pill-btn pill-btn-gold py-3.5 px-12 text-xs">Submit</button></Magnet></div>
+              <p className="text-[9px] text-[#f5f0e8]/30 text-center">I authorize NITPL to contact me, overriding DNC/NDNC.</p>
+            </form>
+          </div>
+        </div>
+      </section>
+
       {/* ═══════ CORPORATE TRUST & LEGACY (About IJM India) ═══════ */}
       <section className="py-20 sm:py-28 bg-[#FAF9F6] relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -922,32 +948,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-        </div>
-      </section>
-
-      {/* ═══════ BOOK SITE VISIT ═══════ */}
-      <section className="py-20 sm:py-28 bg-[#151515] relative">
-        <div className="max-w-md mx-auto px-4 sm:px-6">
-          <div className="gsap-fade-up glass rounded-2xl overflow-hidden neu-shadow p-8">
-            <div className="space-y-4 text-center mb-8">
-              <span className="text-[#b8924a] font-bold text-[10px] uppercase tracking-[0.3em]">By Appointment</span>
-              <h3 className="text-2xl font-serif font-light text-white">Book Site Visit</h3>
-              <div className="w-12 h-px bg-[#b8924a] mx-auto"></div>
-              <p className="text-[#f5f0e8]/50 text-xs leading-relaxed">Schedule a private tour of MIHAN location.</p>
-            </div>
-            <form onSubmit={handleVisitSubmit} className="space-y-4">
-              <input type="text" required value={visitForm.name} onChange={(e) => setVisitForm({...visitForm, name: e.target.value})} placeholder="Full Name" className={`form-input ${errors.name ? "!border-red-500" : ""}`} />
-              <input type="tel" required value={visitForm.phone} onChange={(e) => setVisitForm({...visitForm, phone: e.target.value})} placeholder="Phone Number" className={`form-input ${errors.phone ? "!border-red-500" : ""}`} />
-              <input type="email" required value={visitForm.email} onChange={(e) => setVisitForm({...visitForm, email: e.target.value})} placeholder="Email Address" className={`form-input ${errors.email ? "!border-red-500" : ""}`} />
-              <select value={visitForm.config} onChange={(e) => setVisitForm({...visitForm, config: e.target.value})} className="form-input">
-                <option value="2 BHK">2 BHK</option>
-                <option value="2.5 BHK">2.5 BHK</option>
-                <option value="3 BHK">3 BHK</option>
-              </select>
-              <div className="text-center"><Magnet><button type="submit" className="pill-btn pill-btn-gold py-3.5 px-12 text-xs">Submit</button></Magnet></div>
-              <p className="text-[9px] text-[#f5f0e8]/30 text-center">I authorize NITPL to contact me, overriding DNC/NDNC.</p>
-            </form>
-          </div>
         </div>
       </section>
 
