@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, useEffect, useRef } from "react";
+import { useState, FormEvent, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import {
   Phone,
@@ -25,6 +25,7 @@ import BlurText from "@/components/reactbits/BlurText";
 import CountUp from "@/components/reactbits/CountUp";
 import Magnet from "@/components/reactbits/Magnet";
 import GlareHover from "@/components/reactbits/GlareHover";
+import LeadCaptureModal from "@/components/LeadCaptureModal";
 
 // GSAP & Lenis
 import { gsap } from "gsap";
@@ -33,33 +34,34 @@ import Lenis from "lenis";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── ASSET PATHS (mapped from local renders) ───
+// ─── ASSET PATHS (mapped from local renders — WebP for performance) ───
 const RENDERS = {
-  hero: "/renders/3000/ijm-harmony-evening-to-ni8.jpg",
-  aerial: "/renders/3000/ijm-harmony-aerial-shot-3k.jpg",
-  entrance: "/renders/3000/ijm-entrace-shot-3k.jpg",
-  elevation: "/renders/3000/ijm-harmony-elevation-shot-3k.jpg",
-  elevationBlock: "/renders/3000/ijm-harmony-elevation-block-1-3k.jpg",
-  backElevation: "/renders/3000/ijm-harmony-back-side-elevation3k.jpg",
-  ramp: "/renders/3000/ijm-harmony-ramp-to-two-elevation-3k.jpg",
-  fountain: "/renders/3000/ijm-harmony-water-fountain-3k.jpg",
-  aerialOpt: "/renders/3000/ijm-harmony-aerial-opt-3k.jpg",
-  // Landscape (1500px) — grid cards
-  chitChat: "/renders/landscape/cijm-harmony-chit-chat-park.jpg",
-  childPlay: "/renders/landscape/ijm-harmony-child-playarea.jpg",
-  cricket: "/renders/landscape/ijm-harmony-cricket-pitch.jpg",
-  miyawaki: "/renders/landscape/ijm-harmony-miyawaki-mini-shot.jpg",
-  multiSport: "/renders/landscape/ijm-harmony-multi-sport-court.jpg",
-  sportLawn: "/renders/landscape/ijm-harmony-multi-sport-lawn.jpg",
-  library: "/renders/landscape/ijm-harmony-out-door-library.jpg",
-  gym: "/renders/landscape/ijm-harmony-outdoor-gym.jpg",
-  peace: "/renders/landscape/ijm-harmony-peace-park.jpg",
-  topAngle: "/renders/landscape/ijm-harmony-top-angle-shot.jpg",
-  walking: "/renders/landscape/ijm-harmony-walking-park.jpg",
+  hero: "/renders/3000/ijm-harmony-evening-to-ni8.webp",
+  aerial: "/renders/3000/ijm-harmony-aerial-shot-3k.webp",
+  entrance: "/renders/3000/ijm-entrace-shot-3k.webp",
+  elevation: "/renders/3000/ijm-harmony-elevation-shot-3k.webp",
+  elevationBlock: "/renders/3000/ijm-harmony-elevation-block-1-3k.webp",
+  backElevation: "/renders/3000/ijm-harmony-back-side-elevation3k.webp",
+  ramp: "/renders/3000/ijm-harmony-ramp-to-two-elevation-3k.webp",
+  fountain: "/renders/3000/ijm-harmony-water-fountain-3k.webp",
+  aerialOpt: "/renders/3000/ijm-harmony-aerial-opt-3k.webp",
+  // Landscape — grid cards
+  chitChat: "/renders/landscape/cijm-harmony-chit-chat-park.webp",
+  childPlay: "/renders/landscape/ijm-harmony-child-playarea.webp",
+  cricket: "/renders/landscape/ijm-harmony-cricket-pitch.webp",
+  miyawaki: "/renders/landscape/ijm-harmony-miyawaki-mini-shot.webp",
+  multiSport: "/renders/landscape/ijm-harmony-multi-sport-court.webp",
+  sportLawn: "/renders/landscape/ijm-harmony-multi-sport-lawn.webp",
+  library: "/renders/landscape/ijm-harmony-out-door-library.webp",
+  gym: "/renders/landscape/ijm-harmony-outdoor-gym.webp",
+  peace: "/renders/landscape/ijm-harmony-peace-park.webp",
+  topAngle: "/renders/landscape/ijm-harmony-top-angle-shot.webp",
+  walking: "/renders/landscape/ijm-harmony-walking-park.webp",
   // Interiors
-  balcony: "/renders/interiors/IJM_Balcony_3K.jpg",
-  bedroom: "/renders/interiors/IJM_Bedroom_3K.jpg",
+  balcony: "/renders/interiors/IJM_Balcony_3K.webp",
+  bedroom: "/renders/interiors/IJM_Bedroom_3K.webp",
 };
+
 
 // Form Interface
 interface FormData {
@@ -74,27 +76,31 @@ interface FormData {
 export default function LandingPage() {
   // States
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalTitle, setModalTitle] = useState("Enquire Now");
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activePriceTab, setActivePriceTab] = useState<"2bhk" | "2.5bhk" | "3bhk">("2bhk");
   const [activeFloorTab, setActiveFloorTab] = useState<"2bhk" | "2.5bhk" | "3bhk">("2bhk");
   const [isScrolled, setIsScrolled] = useState(false);
 
+  // Auto-show popup 2 seconds after client load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLeadModalOpen(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const [visitForm, setVisitForm] = useState<FormData>({
     name: "", phone: "", email: "", config: "2.5 BHK", date: ""
   });
-  const [modalForm, setModalForm] = useState<FormData>({
-    name: "", phone: "", email: "", config: "3 BHK", message: ""
-  });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const mainRef = useRef<HTMLDivElement>(null);
-  const heroRef = useRef<HTMLDivElement>(null);
+  const mainRef    = useRef<HTMLDivElement>(null);
+  const heroRef    = useRef<HTMLDivElement>(null);
   const heroTextRef = useRef<HTMLDivElement>(null);
   const heroCtaRef = useRef<HTMLDivElement>(null);
 
-  // Validation
+  // Validation (used by site visit form)
   const validateForm = (data: FormData): boolean => {
     const tempErrors: Record<string, string> = {};
     if (!data.name.trim()) tempErrors.name = "Name is required";
@@ -117,21 +123,10 @@ export default function LandingPage() {
     }
   };
 
-  const handleModalSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (validateForm(modalForm)) {
-      setIsModalOpen(false);
-      setShowSuccess(true);
-      setModalForm({ name: "", phone: "", email: "", config: "3 BHK", message: "" });
-      setErrors({});
-    }
-  };
-
-  const openEnquiryModal = (title: string, defaultBhk: string) => {
-    setModalTitle(title);
-    setModalForm(prev => ({ ...prev, config: defaultBhk }));
-    setIsModalOpen(true);
-  };
+  // All enquiry buttons now open the unified LeadCaptureModal
+  const openEnquiryModal = useCallback((_title: string, _defaultBhk: string) => {
+    setIsLeadModalOpen(true);
+  }, []);
 
   // Scroll listener for header
   useEffect(() => {
@@ -223,7 +218,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <a href="#hero" className="flex items-center">
-              <Image src="/images/footer-logo.png" alt="IJM First City" width={72} height={36} className="object-contain lg:w-[96px] lg:h-[48px]" priority />
+              <Image src="/images/footer-logo.webp" alt="IJM First City" width={72} height={36} className="object-contain lg:w-[96px] lg:h-[48px]" priority />
             </a>
             <nav className="hidden lg:flex items-center gap-8 text-[10px] uppercase tracking-[0.2em] text-[#f5f0e8]/70 font-bold">
               <a href="#overview" className="hover:text-[#C29B57] transition-colors">Overview</a>
@@ -259,7 +254,7 @@ export default function LandingPage() {
       <section ref={heroRef} id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-28 sm:py-32">
         {/* Background — landscape wide render for both mobile and desktop */}
         <Image
-          src="/renders/3000/ijm-harmony-evening-to-ni8.jpg"
+          src={RENDERS.hero}
           alt="IJM Harmony — Evening Panoramic View"
           fill
           priority
@@ -438,6 +433,7 @@ export default function LandingPage() {
         </div>
       </section>
 
+
       {/* ═══════ LEAD CAPTURE FORM (Elevated Glassmorphism) ═══════ */}
       <section className="py-16 sm:py-20 bg-[#151515] relative">
         <div className="max-w-md mx-auto px-4">
@@ -490,63 +486,63 @@ export default function LandingPage() {
           <div className="stagger-container asym-grid">
             {/* Featured — large card */}
             <GlareHover className="stagger-item card-featured luxury-card rounded-xl overflow-hidden relative group">
-              <Image src="/images/amenities/swimming_pool.jpg" alt="Swimming Pool" fill className="object-cover" sizes="(max-width:768px) 100vw, 66vw" loading="lazy" quality={60} />
+              <Image src="/images/amenities/swimming_pool.webp" alt="Swimming Pool" fill className="object-cover" sizes="(max-width:768px) 100vw, 66vw" loading="lazy" quality={82} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-6">
                 <span className="text-white font-serif text-lg font-bold">Swimming Pool</span>
               </div>
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/gymnasium.jpg" alt="Modern Gymnasium" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/gymnasium.webp" alt="Modern Gymnasium" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={82} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
                 <span className="text-white font-serif text-sm font-bold">Modern Gymnasium</span>
               </div>
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/sauna.png" alt="Sauna" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/sauna.webp" alt="Sauna" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={82} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
                 <span className="text-white font-serif text-sm font-bold">Sauna</span>
               </div>
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/steam_room.png" alt="Steam Room" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/steam_room.webp" alt="Steam Room" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={82} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
                 <span className="text-white font-serif text-sm font-bold">Steam Room</span>
               </div>
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/spa.png" alt="Spa" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/spa.webp" alt="Spa" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={82} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
                 <span className="text-white font-serif text-sm font-bold">Spa</span>
               </div>
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/jacuzzi.jpg" alt="Jacuzzi" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/jacuzzi.webp" alt="Jacuzzi" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={82} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
                 <span className="text-white font-serif text-sm font-bold">Jacuzzi</span>
               </div>
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/squash.png" alt="Squash Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/squash.webp" alt="Squash Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={82} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
                 <span className="text-white font-serif text-sm font-bold">Squash Court</span>
               </div>
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/multisport.jpg" alt="Multi-Sport Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/multisport.webp" alt="Multi-Sport Court" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={82} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
                 <span className="text-white font-serif text-sm font-bold">Multi-Sport Court</span>
               </div>
             </GlareHover>
 
             <GlareHover className="stagger-item luxury-card rounded-xl overflow-hidden relative group h-[200px]">
-              <Image src="/images/amenities/cricket.jpg" alt="Box Cricket Pitch" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={55} />
+              <Image src="/images/amenities/cricket.webp" alt="Box Cricket Pitch" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" loading="lazy" quality={82} />
               <div className="absolute inset-0 bg-[#0a0808]/30 group-hover:bg-[#b8924a]/70 transition-all duration-500 z-[1] flex items-end p-4">
                 <span className="text-white font-serif text-sm font-bold">Box Cricket Pitch</span>
               </div>
@@ -702,7 +698,7 @@ export default function LandingPage() {
                   <Magnet><button onClick={() => openEnquiryModal("2 BHK Floor Plan", "2 BHK")} className="pill-btn pill-btn-outline mt-4">Enquire Now</button></Magnet>
                 </div>
                 <div className="lg:w-1/2 relative w-full h-60 sm:h-[380px] bg-[#f0eeeb] rounded-xl border border-[#C29B57]/10 overflow-hidden">
-                  <Image src="/images/Typical-Floor-Plan-v2.png" alt="2 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
+                  <Image src="/images/Typical-Floor-Plan-v2.webp" alt="2 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" quality={90} />
                 </div>
               </>
             )}
@@ -719,7 +715,7 @@ export default function LandingPage() {
                   <Magnet><button onClick={() => openEnquiryModal("2.5 BHK Floor Plan", "2.5 BHK")} className="pill-btn pill-btn-outline mt-4">Enquire Now</button></Magnet>
                 </div>
                 <div className="lg:w-1/2 relative w-full h-60 sm:h-[380px] bg-[#f0eeeb] rounded-xl border border-[#C29B57]/10 overflow-hidden">
-                  <Image src="/images/Floor-Plan-v2.png" alt="2.5 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
+                  <Image src="/images/Floor-Plan-v2.webp" alt="2.5 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" quality={90} />
                 </div>
               </>
             )}
@@ -736,7 +732,7 @@ export default function LandingPage() {
                   <Magnet><button onClick={() => openEnquiryModal("3 BHK Floor Plan", "3 BHK")} className="pill-btn pill-btn-outline mt-4">Enquire Now</button></Magnet>
                 </div>
                 <div className="lg:w-1/2 relative w-full h-60 sm:h-[380px] bg-[#f0eeeb] rounded-xl border border-[#C29B57]/10 overflow-hidden">
-                  <Image src="/images/3bhk-Floor-Plan-v2.png" alt="3 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" />
+                  <Image src="/images/3bhk-Floor-Plan-v2.webp" alt="3 BHK Floor Plan" fill className="object-contain p-4" loading="lazy" quality={90} />
                 </div>
               </>
             )}
@@ -802,13 +798,13 @@ export default function LandingPage() {
           
           {/* Header */}
           <div className="gsap-fade-up text-center mb-16">
-            <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
+            <span className="text-[#C29B57] font-sans font-bold text-[12px] sm:text-[13px] uppercase tracking-[0.3em] block mb-2">
               <ShinyText text="ABOUT IJM INDIA" color="#C29B57" shineColor="#1A1A1A" speed={3} />
             </span>
-            <h2 className="text-3xl sm:text-4xl font-serif font-light text-[#1A1A1A]">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light text-[#1A1A1A]">
               About IJM India
             </h2>
-            <p className="text-[#3a3a3a]/60 text-xs sm:text-sm mt-3 uppercase tracking-wider font-sans font-semibold">
+            <p className="text-[#3a3a3a]/60 text-sm sm:text-base lg:text-lg mt-3 uppercase tracking-wider font-sans font-semibold">
               Engineering Excellence. Global Legacy. Trusted Infrastructure.
             </p>
             <div className="h-px bg-[#C29B57] w-16 mx-auto mt-5"></div>
@@ -820,7 +816,7 @@ export default function LandingPage() {
             <div className="lg:col-span-7 space-y-6 text-left">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-20 h-12 bg-white p-2 rounded-xl flex items-center justify-center border border-[#C29B57]/15 shadow-sm">
-                  <Image src="/images/corporate/logo.png" alt="IJM India Logo" width={80} height={48} className="object-contain" />
+                  <Image src="/images/corporate/logo.webp" alt="IJM India Logo" width={80} height={48} className="object-contain" loading="lazy" />
                 </div>
                 <div>
                   <h3 className="text-lg font-serif font-bold text-[#1A1A1A]">IJM (India) Infrastructure Limited</h3>
@@ -901,7 +897,7 @@ export default function LandingPage() {
                   desc: "Presented by the Construction Industry Development Council (CIDC) of India." 
                 },
                 { 
-                  img: "/images/corporate/morth_appreciation.jpg", 
+                  img: "/images/corporate/morth_appreciation.webp", 
                   title: "MoRTH Certificate of Appreciation", 
                   desc: "Awarded by Hon'ble Union Minister Nitin Gadkari for setting paving records." 
                 },
@@ -940,31 +936,31 @@ export default function LandingPage() {
             <div className="stagger-container grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
                 { 
-                  img: "/images/testimonials/nagdeve.jpg", 
+                  img: "/images/testimonials/nagdeve.webp", 
                   name: "Mr. & Mrs. Nagdeve", 
                   text: "Choosing Harmony Tower felt right from the beginning. The clarity in communication, thoughtful planning, and overall vision of the project gave us complete confidence. We're really looking forward to building our life here." 
                 },
                 { 
-                  img: "/images/testimonials/kaner.jpg", 
+                  img: "/images/testimonials/kaner.webp", 
                   name: "Mr. Yash Kaner", 
                   text: "Buying a home is a big milestone, and First City made it truly special for us. Beyond just a home, it offers the lifestyle upgrade we were looking for—with thoughtful design, great amenities, and a location that perfectly fits our vision of a dream home." 
                 },
                 { 
-                  img: "/images/testimonials/gadkari.jpg", 
+                  img: "/images/testimonials/gadkari.webp", 
                   name: "Mr. & Mrs. Gadkari", 
                   text: "From our very first visit, First City gave us a sense of trust. Seeing a well-developed township with a growing community and quality infrastructure made our decision much easier. Today, we're happy to be part of a place that offers both a comfortable lifestyle and strong long-term value." 
                 },
                 { 
-                  img: "/images/testimonials/singh.jpg", 
+                  img: "/images/testimonials/singh.webp", 
                   name: "Mr. & Mrs. Singh", 
                   text: "A home is more than four walls, and that's exactly what we found at First City. The peaceful environment, well-planned spaces, and vibrant township feeling made it easy for us to imagine our future here." 
                 }
               ].map((item, i) => (
-                <GlareHover key={i} className="stagger-item bg-white border border-[#C29B57]/15 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row gap-6 items-center sm:items-start text-left shadow-sm hover:shadow-md transition-all duration-300 h-full">
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-[#C29B57]/20 flex-shrink-0 shadow-inner">
+                <div key={i} className="stagger-item bg-white border border-[#C29B57]/15 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row gap-6 items-center sm:items-start text-left shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-300 h-full">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-[#C29B57]/20 flex-shrink-0 shadow-inner bg-[#FAF9F6]">
                     <Image src={item.img} alt={item.name} fill className="object-cover" sizes="96px" loading="lazy" />
                   </div>
-                  <div className="flex flex-col justify-between flex-grow h-full space-y-3">
+                  <div className="flex flex-col justify-between flex-grow space-y-3">
                     <div className="space-y-1">
                       <div className="flex gap-0.5 text-[#C29B57] mb-1">
                         {[...Array(5)].map((_, idx) => <Star key={idx} size={11} fill="#C29B57" stroke="none" />)}
@@ -973,7 +969,7 @@ export default function LandingPage() {
                     </div>
                     <p className="text-[#3a3a3a]/80 text-xs sm:text-[13px] leading-relaxed italic font-sans font-medium">&ldquo;{item.text}&rdquo;</p>
                   </div>
-                </GlareHover>
+                </div>
               ))}
             </div>
           </div>
@@ -1012,7 +1008,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pb-12 border-b border-white/5">
             <div className="space-y-4">
-              <Image src="/images/footer-logo.png" alt="IJM Logo" width={72} height={40} className="object-contain" />
+              <Image src="/images/footer-logo.webp" alt="IJM Logo" width={72} height={40} className="object-contain" loading="lazy" />
               <p className="text-[#f5f0e8]/40 text-xs leading-relaxed max-w-xs">IJM First City, Sector-20, MIHAN, Nagpur, Maharashtra</p>
             </div>
             <div className="space-y-3">
@@ -1039,7 +1035,7 @@ export default function LandingPage() {
           </div>
           <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-white/30">
             <span>Powered by OG</span>
-            <img src="https://www.letsoutgrow.com/oglogo.png" alt="OG Logo" className="h-[20px] inline-block" />
+            <Image src="https://www.letsoutgrow.com/oglogo.png" alt="OG Logo" width={60} height={20} className="h-[20px] w-auto inline-block" loading="lazy" />
           </div>
         </div>
       </footer>
@@ -1054,30 +1050,11 @@ export default function LandingPage() {
         </a>
       </div>
 
-      {/* ═══════ ENQUIRY MODAL ═══════ */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-          <div className="relative w-full max-w-md rounded-2xl p-6 sm:p-8 border border-[#C29B57]/25 border-t-2 border-t-[#C29B57] bg-[#1a1a1a] shadow-2xl">
-            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-white/50 hover:text-[#C29B57] transition-colors" aria-label="Close"><X size={20} /></button>
-            <div className="text-center mb-6">
-              <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">{modalTitle}</h3>
-              <p className="text-[#f5f0e8]/50 text-xs mt-1">Our team will call back in 15 mins</p>
-            </div>
-            <form onSubmit={handleModalSubmit} className="space-y-4">
-              <input type="text" required value={modalForm.name} onChange={(e) => setModalForm({...modalForm, name: e.target.value})} placeholder="Full Name" className={`form-input ${errors.name ? "!border-red-500" : ""}`} />
-              <input type="tel" required value={modalForm.phone} onChange={(e) => setModalForm({...modalForm, phone: e.target.value})} placeholder="Phone Number" className={`form-input ${errors.phone ? "!border-red-500" : ""}`} />
-              <input type="email" required value={modalForm.email} onChange={(e) => setModalForm({...modalForm, email: e.target.value})} placeholder="Email Address" className={`form-input ${errors.email ? "!border-red-500" : ""}`} />
-              <select value={modalForm.config} onChange={(e) => setModalForm({...modalForm, config: e.target.value})} className="form-input">
-                <option value="2 BHK">2 BHK Apartments</option>
-                <option value="2.5 BHK">2.5 BHK Apartments</option>
-                <option value="3 BHK">3 BHK Apartments</option>
-              </select>
-              <Magnet><button type="submit" className="pill-btn pill-btn-gold w-full py-3.5 text-xs">Submit Enquiry</button></Magnet>
-              <p className="text-[9px] text-[#f5f0e8]/30 text-center">I authorize NITPL to contact me, overriding DNC/NDNC.</p>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* ═══════ LEAD CAPTURE MODAL (unified — auto popup + all CTA buttons) ═══════ */}
+      <LeadCaptureModal
+        isOpen={isLeadModalOpen}
+        onClose={() => setIsLeadModalOpen(false)}
+      />
 
       {/* ═══════ SUCCESS MODAL ═══════ */}
       {showSuccess && (

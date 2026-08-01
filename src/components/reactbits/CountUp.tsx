@@ -12,12 +12,14 @@ interface CountUpProps {
 }
 
 export default function CountUp({ to, from = 0, duration = 2.2, suffix = "", decimals = 0 }: CountUpProps) {
-  const [count, setCount] = useState(from);
+  const [count, setCount] = useState(to);
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "0px 0px -50px 0px" });
+  const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || hasAnimated.current) return;
+    hasAnimated.current = true;
     let startTime: number | null = null;
     let animationFrameId: number;
 
