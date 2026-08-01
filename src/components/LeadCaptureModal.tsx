@@ -253,7 +253,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                   type="submit"
                   className="px-10 py-3.5 bg-gradient-to-r from-[#C29B57] to-[#b8924a] text-[#0a0808] border-none rounded-full font-extrabold text-xs tracking-widest uppercase shadow-[0_4px_16px_rgba(194,155,87,0.3)] hover:scale-[1.01] hover:shadow-[0_8px_24px_rgba(194,155,87,0.45)] transition-all"
                 >
-                  GET PRICING SHEET
+                  Submit
                 </button>
               </div>
 
