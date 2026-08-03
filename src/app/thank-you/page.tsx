@@ -106,7 +106,7 @@ export default function ThankYouPage() {
             </h2>
             <div className="w-12 h-px bg-[#C29B57] mx-auto my-3" />
             <p className="text-[#f5f0e8]/65 text-xs sm:text-sm max-w-lg leading-relaxed font-sans mx-auto">
-              Our dedicated property advisor will contact you within the next <strong className="text-white font-semibold">15 minutes</strong> with pricing details, floor plans, exclusive offers, and site visit assistance.
+              Our dedicated property advisor will contact you shortly with pricing details, floor plans, exclusive offers, and site visit assistance.
             </p>
           </motion.div>
 
