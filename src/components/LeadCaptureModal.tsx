@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, FormEvent } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { X, CheckCircle } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -29,18 +30,20 @@ const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
 function validate(form: LeadForm): LeadErrors {
   const e: LeadErrors = {};
   if (!form.name.trim()) e.name = "Full name is required";
-  if (!form.phone.trim()) e.phone = "Mobile number is required";
-  else if (!PHONE_RE.test(form.phone)) e.phone = "Enter a valid 10-digit mobile number";
-  if (form.email && !EMAIL_RE.test(form.email)) e.email = "Enter a valid email address";
+  if (!form.phone.trim()) e.phone = "Phone number is required";
+  else if (!PHONE_RE.test(form.phone.trim())) e.phone = "Enter a valid 10-digit phone number";
+  if (!form.email.trim()) e.email = "Email address is required";
+  else if (!EMAIL_RE.test(form.email.trim())) e.email = "Enter a valid email address";
   return e;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [form, setForm] = useState<LeadForm>({ name: "", phone: "", email: "", config: "2.5 BHK" });
   const [errors, setErrors] = useState<LeadErrors>({});
-  const [success, setSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [visible, setVisible] = useState(false);
   const firstInputRef = useRef<HTMLInputElement>(null);
   const previousFocusRef = useRef<Element | null>(null);
@@ -54,14 +57,17 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
   useEffect(() => {
     if (isOpen) {
       previousFocusRef.current = document.activeElement;
-      const raf = requestAnimationFrame(() => {
-        setVisible(true);
-        setTimeout(() => firstInputRef.current?.focus(), 100);
-      });
-      return () => cancelAnimationFrame(raf);
+      setVisible(true);
+      setIsSubmitting(false);
+      setForm({ name: "", phone: "", email: "", config: "2.5 BHK" });
+      setErrors({});
+      document.body.style.overflow = "hidden";
+      setTimeout(() => firstInputRef.current?.focus(), 80);
     } else {
+      document.body.style.overflow = "";
       setVisible(false);
     }
+    return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
   // ── 3. Keyboard handling: Escape key & focus trap ──────────────────────────
@@ -92,34 +98,41 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     setVisible(false);
     setTimeout(() => {
       onClose();
-      setSuccess(false);
+      setIsSubmitting(false);
       setForm({ name: "", phone: "", email: "", config: "2.5 BHK" });
       setErrors({});
       (previousFocusRef.current as HTMLElement | null)?.focus();
     }, 280);
   }, [onClose]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const errs = validate(form);
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
-    setSuccess(true);
+    setIsSubmitting(true);
 
     // Send payload to Google Sheets Apps Script Web App
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhoWE8UOBwhLH22xnth2ef7XolaSt1CTjz5GkH-ABjZXE5pO_0gn4UBC9wemmtJO3D/exec";
-    fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: form.name,
-        phone: form.phone,
-        email: form.email,
-        config: form.config,
-        source: "Popup Lead Modal"
-      }),
-    }).catch(err => console.error("Google Sheet submission error:", err));
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          config: form.config,
+          source: "Popup Lead Modal"
+        }),
+      });
+    } catch (err) {
+      console.error("Google Sheet submission error:", err);
+    } finally {
+      handleClose();
+      router.push("/thank-you");
+    }
   };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {

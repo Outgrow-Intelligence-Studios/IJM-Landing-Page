@@ -2,6 +2,7 @@
 
 import { useState, FormEvent, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   Phone,
   Mail,
@@ -114,28 +115,37 @@ export default function LandingPage() {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleVisitSubmit = (e: FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  const handleVisitSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (validateForm(visitForm)) {
-      setShowSuccess(true);
+      setIsSubmitting(true);
 
       // Send payload to Google Sheets Apps Script Web App
       const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhoWE8UOBwhLH22xnth2ef7XolaSt1CTjz5GkH-ABjZXE5pO_0gn4UBC9wemmtJO3D/exec";
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: visitForm.name,
-          phone: visitForm.phone,
-          email: visitForm.email,
-          config: visitForm.config,
-          source: "Inline Website Form"
-        }),
-      }).catch(err => console.error("Google Sheet submission error:", err));
-
-      setVisitForm({ name: "", phone: "", email: "", config: "2.5 BHK", date: "" });
-      setErrors({});
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: visitForm.name,
+            phone: visitForm.phone,
+            email: visitForm.email,
+            config: visitForm.config,
+            source: "Inline Website Form"
+          }),
+        });
+      } catch (err) {
+        console.error("Google Sheet submission error:", err);
+      } finally {
+        setVisitForm({ name: "", phone: "", email: "", config: "2.5 BHK", date: "" });
+        setErrors({});
+        setIsSubmitting(false);
+        router.push("/thank-you");
+      }
     }
   };
 
@@ -478,7 +488,9 @@ export default function LandingPage() {
                 <option value="3 BHK">3 BHK</option>
               </select>
               <div className="text-center"><Magnet>
-                <button type="submit" className="pill-btn pill-btn-gold py-3 px-12">Submit</button>
+                <button type="submit" disabled={isSubmitting} className="pill-btn pill-btn-gold py-3 px-12 disabled:opacity-60">
+                  {isSubmitting ? "Submitting..." : "Submit"}
+                </button>
               </Magnet></div>
               <p className="text-[9px] text-[#f5f0e8]/30 text-center">I authorize NITPL to contact me, overriding DNC/NDNC.</p>
             </form>
@@ -775,7 +787,11 @@ export default function LandingPage() {
                 <option value="2.5 BHK">2.5 BHK</option>
                 <option value="3 BHK">3 BHK</option>
               </select>
-              <div className="text-center"><Magnet><button type="submit" className="pill-btn pill-btn-gold py-3.5 px-12 text-xs">Submit</button></Magnet></div>
+              <div className="text-center"><Magnet>
+                <button type="submit" disabled={isSubmitting} className="pill-btn pill-btn-gold py-3.5 px-12 text-xs disabled:opacity-60">
+                  {isSubmitting ? "Submitting..." : "Submit"}
+                </button>
+              </Magnet></div>
               <p className="text-[9px] text-[#f5f0e8]/30 text-center">I authorize NITPL to contact me, overriding DNC/NDNC.</p>
             </form>
           </div>
