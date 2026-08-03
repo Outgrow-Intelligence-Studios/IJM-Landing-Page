@@ -105,6 +105,21 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
     setSuccess(true);
+
+    // Send payload to Google Sheets Apps Script Web App
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhoWE8UOBwhLH22xnth2ef7XolaSt1CTjz5GkH-ABjZXE5pO_0gn4UBC9wemmtJO3D/exec";
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        config: form.config,
+        source: "Popup Lead Modal"
+      }),
+    }).catch(err => console.error("Google Sheet submission error:", err));
   };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
