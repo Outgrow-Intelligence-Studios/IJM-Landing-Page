@@ -166,6 +166,7 @@ export default function LandingPage() {
     gsap.registerPlugin(ScrollTrigger);
     const isMobile = window.innerWidth < 768;
     let lenis: Lenis | null = null;
+    let tickerCb: ((time: number) => void) | null = null;
 
     // Only use Lenis on desktop — mobile uses native scroll (zero lag)
     if (!isMobile) {
@@ -176,14 +177,13 @@ export default function LandingPage() {
         smoothTouch: false,
       });
 
-      function raf(time: number) {
-        lenis!.raf(time);
-        requestAnimationFrame(raf);
-      }
-      requestAnimationFrame(raf);
-
       lenis.on("scroll", ScrollTrigger.update);
-      gsap.ticker.add((time) => lenis!.raf(time * 1000));
+      tickerCb = (time: number) => {
+        if (lenis) {
+          lenis.raf(time * 1000);
+        }
+      };
+      gsap.ticker.add(tickerCb);
       gsap.ticker.lagSmoothing(0);
     }
 
@@ -229,7 +229,13 @@ export default function LandingPage() {
     }, mainRef);
 
     return () => {
-      if (lenis) lenis.destroy();
+      if (tickerCb) {
+        gsap.ticker.remove(tickerCb);
+      }
+      if (lenis) {
+        lenis.destroy();
+        lenis = null;
+      }
       ctx.revert();
       ScrollTrigger.getAll().forEach(t => t.kill());
     };

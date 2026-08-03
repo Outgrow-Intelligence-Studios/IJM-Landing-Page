@@ -52,10 +52,12 @@ const BlurText: React.FC<BlurTextProps> = ({
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (!ref.current) return;
+    if (!ref.current || typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setInView(entry.isIntersecting);
+      (entries) => {
+        if (entries && entries[0]) {
+          setInView(entries[0].isIntersecting);
+        }
       },
       { threshold: 0.2, rootMargin }
     );
