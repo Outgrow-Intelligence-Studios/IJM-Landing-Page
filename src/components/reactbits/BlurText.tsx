@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 type BlurTextProps = {
@@ -20,19 +20,34 @@ export default function BlurText({
   direction = 'bottom',
   as: Component = 'span'
 }: BlurTextProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const elements = animateBy === 'words' ? text.split(' ') : text.split('');
-  const initialY = direction === 'top' ? -25 : 25;
+  const initialY = direction === 'top' ? -20 : 20;
+
+  // Static fallback before hydration ensures headings are ALWAYS 100% visible
+  if (!isClient) {
+    return (
+      <Component className={`blur-text ${className} inline-flex flex-wrap justify-center`}>
+        {text}
+      </Component>
+    );
+  }
 
   return (
     <Component className={`blur-text ${className} inline-flex flex-wrap justify-center`}>
       {elements.map((segment, index) => (
         <motion.span
           key={index}
-          initial={{ opacity: 0, filter: 'blur(8px)', y: initialY }}
+          initial={{ opacity: 0, filter: 'blur(6px)', y: initialY }}
           whileInView={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
+          viewport={{ once: true, amount: 0.05 }}
           transition={{
-            duration: 0.45,
+            duration: 0.4,
             delay: (index * delay) / 1000,
             ease: [0.25, 0.1, 0.25, 1]
           }}
