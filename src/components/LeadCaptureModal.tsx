@@ -55,6 +55,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
 
   // ── 2. Trigger entry animation after modal opens ──────────────────────────
   useEffect(() => {
+    if (typeof window === "undefined") return;
     if (isOpen) {
       previousFocusRef.current = document.activeElement;
       setVisible(true);

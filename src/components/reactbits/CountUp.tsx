@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useInView } from "framer-motion";
 
 interface CountUpProps {
   to: number;
@@ -12,33 +11,53 @@ interface CountUpProps {
 }
 
 export default function CountUp({ to, from = 0, duration = 2.2, suffix = "", decimals = 0 }: CountUpProps) {
-  const [count, setCount] = useState(to);
+  const targetVal = isNaN(Number(to)) ? 0 : Number(to);
+  const startVal = isNaN(Number(from)) ? 0 : Number(from);
+  const [count, setCount] = useState(targetVal);
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "0px 0px -50px 0px" });
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (!isInView || hasAnimated.current) return;
-    hasAnimated.current = true;
-    let startTime: number | null = null;
-    let animationFrameId: number;
+    if (!ref.current || typeof window === "undefined" || !("IntersectionObserver" in window)) return;
 
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
-      setCount(progress * (to - from) + from);
-      if (progress < 1) {
-        animationFrameId = requestAnimationFrame(step);
+    let animationFrameId: number | null = null;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries && entries[0] && entries[0].isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
+          let startTime: number | null = null;
+
+          const step = (timestamp: number) => {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / (duration * 1000), 1);
+            const val = progress * (targetVal - startVal) + startVal;
+            setCount(isNaN(val) ? targetVal : val);
+            if (progress < 1) {
+              animationFrameId = requestAnimationFrame(step);
+            }
+          };
+
+          animationFrameId = requestAnimationFrame(step);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(ref.current);
+    return () => {
+      observer.disconnect();
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
       }
     };
+  }, [targetVal, startVal, duration]);
 
-    animationFrameId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [isInView, to, from, duration]);
+  const displayNum = typeof count === "number" && !isNaN(count) ? count.toFixed(decimals) : targetVal.toString();
 
   return (
     <span ref={ref}>
-      {count.toFixed(decimals)}
+      {displayNum}
       {suffix}
     </span>
   );

@@ -3,6 +3,7 @@
 import { useState, FormEvent, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   Phone,
   Mail,
@@ -27,11 +28,6 @@ import CountUp from "@/components/reactbits/CountUp";
 import Magnet from "@/components/reactbits/Magnet";
 import GlareHover from "@/components/reactbits/GlareHover";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
-
-// GSAP & Lenis
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "lenis";
 
 // ─── ASSET PATHS (mapped from local renders — WebP for performance) ───
 const RENDERS = {
@@ -152,93 +148,14 @@ export default function LandingPage() {
     setIsLeadModalOpen(true);
   }, []);
 
-  // Scroll listener for header
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Lenis + GSAP ScrollTrigger (Mobile: skip Lenis entirely)
+  // Scroll listener for header with passive event handling
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    gsap.registerPlugin(ScrollTrigger);
-    const isMobile = window.innerWidth < 768;
-    let lenis: Lenis | null = null;
-    let tickerCb: ((time: number) => void) | null = null;
-
-    // Only use Lenis on desktop — mobile uses native scroll (zero lag)
-    if (!isMobile) {
-      lenis = new Lenis({
-        duration: 1.4,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-        smoothTouch: false,
-      });
-
-      lenis.on("scroll", ScrollTrigger.update);
-      tickerCb = (time: number) => {
-        if (lenis) {
-          lenis.raf(time * 1000);
-        }
-      };
-      gsap.ticker.add(tickerCb);
-      gsap.ticker.lagSmoothing(0);
-    }
-
-    // GSAP scroll-triggered animations
-    const ctx = gsap.context(() => {
-
-      // ═══════ HERO — No animation, just visible ═══════
-      if (heroCtaRef.current) {
-        heroCtaRef.current.style.opacity = "1";
-      }
-
-      // Fade-up animations (lightweight, GPU-only props)
-      gsap.utils.toArray<HTMLElement>(".gsap-fade-up").forEach((el) => {
-        gsap.to(el, {
-          opacity: 1,
-          y: 0,
-          duration: isMobile ? 0.5 : 0.9,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 90%",
-            toggleActions: "play none none none",
-          },
-        });
-      });
-
-      gsap.utils.toArray<HTMLElement>(".stagger-container").forEach((container) => {
-        const cards = container.querySelectorAll(".stagger-item");
-        gsap.fromTo(cards,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1, y: 0,
-            duration: isMobile ? 0.4 : 0.7,
-            stagger: isMobile ? 0.06 : 0.12,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: container,
-              start: "top 90%",
-            },
-          }
-        );
-      });
-    }, mainRef);
-
-    return () => {
-      if (tickerCb) {
-        gsap.ticker.remove(tickerCb);
-      }
-      if (lenis) {
-        lenis.destroy();
-        lenis = null;
-      }
-      ctx.revert();
-      ScrollTrigger.getAll().forEach(t => t.kill());
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
     };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
@@ -372,7 +289,7 @@ export default function LandingPage() {
       {/* ═══════ WHAT WE OFFER — ASYMMETRIC GRID (Landscape renders) ═══════ */}
       <section id="overview" className="py-20 sm:py-28 bg-[#FAF9F6] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="gsap-fade-up text-center mb-14">
+          <div className="text-center mb-14">
             <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
               <ShinyText text="WHAT WE OFFER" color="#C29B57" shineColor="#f5f0e8" speed={3} />
             </span>
@@ -468,7 +385,7 @@ export default function LandingPage() {
       {/* ═══════ LEAD CAPTURE FORM (Elevated Glassmorphism) ═══════ */}
       <section className="py-16 sm:py-20 bg-[#151515] relative">
         <div className="max-w-md mx-auto px-4">
-          <div className="gsap-fade-up glass-gold rounded-2xl p-8 sm:p-10 neu-shadow">
+          <div className="glass-gold rounded-2xl p-8 sm:p-10 neu-shadow">
             <div className="text-center mb-8">
               <span className="text-[#b8924a] font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">Get Exclusive Pricing</span>
               <h3 className="text-2xl sm:text-3xl font-serif font-light text-white">Enquire Now</h3>
@@ -506,7 +423,7 @@ export default function LandingPage() {
       {/* ═══════ RECOMMENDED PROPERTIES — ASYMMETRIC GRID (Landscape renders) ═══════ */}
       <section id="amenities" className="pt-20 pb-10 sm:pt-28 sm:pb-16 bg-[#151515] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="gsap-fade-up text-center mb-14">
+          <div className="text-center mb-14">
             <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
               <ShinyText text="RESORT LIVING" color="#C29B57" shineColor="#f5f0e8" speed={3} />
             </span>
@@ -589,7 +506,7 @@ export default function LandingPage() {
       {/* ═══════ INTERIOR HIGHLIGHTS (3000px Interior renders) ═══════ */}
       <section className="py-20 sm:py-28 bg-[#FAF9F6] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="gsap-fade-up text-center mb-14">
+          <div className="text-center mb-14">
             <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
               <ShinyText text="INTERIORS" color="#C29B57" shineColor="#1A1A1A" speed={3} />
             </span>
@@ -626,7 +543,7 @@ export default function LandingPage() {
       {/* ═══════ PRICING SECTION ═══════ */}
       <section id="configurations" className="py-20 sm:py-28 bg-[#151515] relative">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="gsap-fade-up text-center mb-14">
+          <div className="text-center mb-14">
             <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
               <ShinyText text="PRICING & PLANS" color="#C29B57" shineColor="#f5f0e8" speed={3} />
             </span>
@@ -699,7 +616,7 @@ export default function LandingPage() {
       {/* ═══════ FLOOR PLANS ═══════ */}
       <section id="floor-plans" className="py-20 sm:py-28 bg-[#FAF9F6] relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="gsap-fade-up text-center mb-14">
+          <div className="text-center mb-14">
             <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
               <ShinyText text="FLOOR LAYOUTS" color="#C29B57" shineColor="#1A1A1A" speed={3} />
             </span>
@@ -991,7 +908,7 @@ export default function LandingPage() {
       {/* ═══════ CONNECTIVITY & LOCATION ═══════ */}
       <section id="connectivity" className="py-20 sm:py-28 bg-[#151515] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="gsap-fade-up text-center mb-14">
+          <div className="text-center mb-14">
             <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
               <ShinyText text="LOCATION ADVANTAGE" color="#C29B57" shineColor="#f5f0e8" speed={3} />
             </span>
