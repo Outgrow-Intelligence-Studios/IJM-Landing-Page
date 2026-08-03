@@ -33,8 +33,6 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 
-gsap.registerPlugin(ScrollTrigger);
-
 // ─── ASSET PATHS (mapped from local renders — WebP for performance) ───
 const RENDERS = {
   hero: "/renders/3000/ijm-harmony-evening-to-ni8.webp",
@@ -165,6 +163,7 @@ export default function LandingPage() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    gsap.registerPlugin(ScrollTrigger);
     const isMobile = window.innerWidth < 768;
     let lenis: Lenis | null = null;
 

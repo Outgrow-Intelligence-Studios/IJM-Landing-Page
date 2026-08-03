@@ -101,7 +101,11 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
       setIsSubmitting(false);
       setForm({ name: "", phone: "", email: "", config: "2.5 BHK" });
       setErrors({});
-      (previousFocusRef.current as HTMLElement | null)?.focus();
+      if (previousFocusRef.current && typeof (previousFocusRef.current as any).focus === "function") {
+        try {
+          (previousFocusRef.current as HTMLElement).focus();
+        } catch (_) {}
+      }
     }, 280);
   }, [onClose]);
 
