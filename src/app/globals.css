@@ -424,37 +424,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ═══════════════════════════════════════════════
-   GSAP ANIMATION HELPERS (initial hidden states)
+   ANIMATION HELPERS (100% visible by default)
    ═══════════════════════════════════════════════ */
 
-.gsap-fade-up {
-  opacity: 0;
-  transform: translateY(40px);
-}
-
-.gsap-fade-left {
-  opacity: 0;
-  transform: translateX(-40px);
-}
-
-.gsap-fade-right {
-  opacity: 0;
-  transform: translateX(40px);
-}
-
+.gsap-fade-up,
+.gsap-fade-left,
+.gsap-fade-right,
 .gsap-scale-in {
-  opacity: 0;
-  transform: scale(0.9);
-}
-
-/* will-change only on desktop where GPU can handle it */
-@media (min-width: 769px) {
-  .gsap-fade-up,
-  .gsap-fade-left,
-  .gsap-fade-right,
-  .gsap-scale-in {
-    will-change: transform, opacity;
-  }
+  opacity: 1;
+  transform: none;
 }
 
 /* GPU acceleration utility */

@@ -172,6 +172,7 @@ export default function LandingPage() {
               <a href="#overview" className="hover:text-[#C29B57] transition-colors">Overview</a>
               <a href="#amenities" className="hover:text-[#C29B57] transition-colors">Amenities</a>
               <a href="#floor-plans" className="hover:text-[#C29B57] transition-colors">Floor Plans</a>
+              <a href="#gallery" className="hover:text-[#C29B57] transition-colors">Gallery</a>
               <a href="#configurations" className="hover:text-[#C29B57] transition-colors">Pricing</a>
               <a href="#connectivity" className="hover:text-[#C29B57] transition-colors">Location</a>
             </nav>
@@ -191,6 +192,7 @@ export default function LandingPage() {
               <a href="#overview" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Overview</a>
               <a href="#amenities" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Amenities</a>
               <a href="#floor-plans" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Floor Plans</a>
+              <a href="#gallery" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Gallery</a>
               <a href="#configurations" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Pricing</a>
               <a href="#connectivity" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Location</a>
             </nav>
@@ -686,6 +688,48 @@ export default function LandingPage() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ PROJECT GALLERY ═══════ */}
+      <section id="gallery" className="py-20 sm:py-28 bg-[#151515] relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-14">
+            <span className="text-[#C29B57] font-sans font-bold text-[10px] uppercase tracking-[0.3em] block mb-2">
+              <ShinyText text="VISUAL EXPERIENCE" color="#C29B57" shineColor="#f5f0e8" speed={3} />
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-light text-white">
+              <BlurText text="Project Gallery" delay={80} animateBy="words" direction="bottom" />
+            </h2>
+            <div className="h-px bg-[#C29B57] w-16 mx-auto mt-4"></div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { img: "/images/gallery/gallery1.webp", title: "Panoramic Township View", caption: "31-acre integrated gated ecosystem" },
+              { img: "/images/gallery/gallery2.webp", title: "Water Fountain Plaza", caption: "Central landscaped fountain & promenade" },
+              { img: "/images/gallery/gallery3.webp", title: "Miyawaki Mini Forest", caption: "Dense green canopy & peaceful walking trail" },
+              { img: "/images/gallery/gallery4.webp", title: "Multi-Sport Court", caption: "Professional outdoor sports facility" },
+              { img: "/images/gallery/gallery5.webp", title: "Architectural Elevation", caption: "Modern RCC shear wall structure" },
+              { img: "/images/gallery/gallery6.webp", title: "Grand Residential Towers", caption: "15-storey luxury high-rise residences" },
+            ].map((item, index) => (
+              <GlareHover key={index} className="bg-[#1e1a14] border border-[#C29B57]/20 rounded-xl overflow-hidden shadow-lg group relative h-[260px] sm:h-[300px]">
+                <Image
+                  src={item.img}
+                  alt={item.title}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  loading="lazy"
+                  quality={85}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-5 flex flex-col justify-end">
+                  <h3 className="font-serif font-bold text-white text-base mb-1">{item.title}</h3>
+                  <p className="text-[#C29B57]/80 text-xs font-sans">{item.caption}</p>
+                </div>
+              </GlareHover>
+            ))}
           </div>
         </div>
       </section>
