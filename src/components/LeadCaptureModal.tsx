@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
+import { trackLeadFormSubmit } from "@/lib/gtm";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface LeadForm {
@@ -136,6 +137,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     } catch (err) {
       console.error("Google Sheet submission error:", err);
     } finally {
+      trackLeadFormSubmit();
       handleClose();
       router.push("/thank-you");
     }

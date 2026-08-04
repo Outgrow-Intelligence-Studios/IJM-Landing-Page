@@ -28,6 +28,7 @@ import CountUp from "@/components/reactbits/CountUp";
 import Magnet from "@/components/reactbits/Magnet";
 import GlareHover from "@/components/reactbits/GlareHover";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
+import { trackLeadFormSubmit } from "@/lib/gtm";
 
 // ─── ASSET PATHS (mapped from local renders — WebP for performance) ───
 const RENDERS = {
@@ -135,6 +136,7 @@ export default function LandingPage() {
       } catch (err) {
         console.error("Google Sheet submission error:", err);
       } finally {
+        trackLeadFormSubmit();
         setVisitForm({ name: "", phone: "", email: "", config: "2.5 BHK", date: "" });
         setErrors({});
         setIsSubmitting(false);
