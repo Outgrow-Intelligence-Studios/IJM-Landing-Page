@@ -226,7 +226,7 @@ export default function LandingPage() {
         <div ref={heroTextRef} className="relative z-[3] w-full max-w-5xl mx-auto px-5 text-center flex flex-col items-center">
 
           {/* Eyebrow */}
-          <p className="mb-4 text-[#C29B57] text-[10px] sm:text-[11px] font-sans font-semibold uppercase tracking-[0.35em]" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.5)" }}>
+          <p className="mb-4 text-[#E2B866] text-[10px] sm:text-[11px] font-sans font-bold uppercase tracking-[0.35em] px-4 py-1.5 rounded-full bg-[#0a0808]/60 border border-[#C29B57]/35 backdrop-blur-sm inline-block shadow-[0_4px_20px_rgba(0,0,0,0.5)]" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
             IJM FIRST CITY — MIHAN, NAGPUR
           </p>
 
