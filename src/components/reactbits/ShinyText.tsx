@@ -30,7 +30,6 @@ const ShinyText: React.FC<ShinyTextProps> = ({
   direction = 'left',
   delay = 0
 }) => {
-  const [isClient, setIsClient] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const progress = useMotionValue(0);
   const elapsedRef = useRef(0);
@@ -39,10 +38,6 @@ const ShinyText: React.FC<ShinyTextProps> = ({
 
   const animationDuration = speed * 1000;
   const delayDuration = delay * 1000;
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   useAnimationFrame(time => {
     if (disabled || isPaused) {
@@ -106,14 +101,6 @@ const ShinyText: React.FC<ShinyTextProps> = ({
   const handleMouseLeave = useCallback(() => {
     if (pauseOnHover) setIsPaused(false);
   }, [pauseOnHover]);
-
-  if (!isClient) {
-    return (
-      <span className={`inline-block ${className}`} style={{ color }}>
-        {text}
-      </span>
-    );
-  }
 
   const gradientStyle: React.CSSProperties = {
     backgroundImage: `linear-gradient(${spread}deg, ${color} 0%, ${color} 35%, ${shineColor} 50%, ${color} 65%, ${color} 100%)`,

@@ -56,7 +56,7 @@ export default function CountUp({ to, from = 0, duration = 2.2, suffix = "", dec
   const displayNum = typeof count === "number" && !isNaN(count) ? count.toFixed(decimals) : targetVal.toString();
 
   return (
-    <span ref={ref}>
+    <span suppressHydrationWarning ref={ref}>
       {displayNum}
       {suffix}
     </span>

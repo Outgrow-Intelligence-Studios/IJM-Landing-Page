@@ -152,6 +152,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
 
   const modalContent = (
     <div
+      suppressHydrationWarning
       role="dialog"
       aria-modal="true"
       aria-labelledby="lcm-heading"

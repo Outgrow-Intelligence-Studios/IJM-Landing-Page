@@ -32,7 +32,8 @@ import { trackLeadFormSubmit } from "@/lib/gtm";
 
 // ─── ASSET PATHS (mapped from local renders — WebP for performance) ───
 const RENDERS = {
-  hero: "/renders/3000/ijm-harmony-evening-to-ni8.webp",
+  hero: "/renders/3000/ijm-hero-desktop.webp",
+  heroMobile: "/renders/3000/ijm-hero-mobile.webp",
   aerial: "/renders/3000/ijm-harmony-aerial-shot-3k.webp",
   entrance: "/renders/3000/ijm-entrace-shot-3k.webp",
   elevation: "/renders/3000/ijm-harmony-elevation-shot-3k.webp",
@@ -161,7 +162,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div ref={mainRef} className="relative min-h-screen text-[#f5f0e8] bg-[#151515] antialiased selection:bg-[#C29B57] selection:text-[#151515]">
+    <div suppressHydrationWarning ref={mainRef} className="relative min-h-screen text-[#f5f0e8] bg-[#151515] antialiased selection:bg-[#C29B57] selection:text-[#151515]">
 
       {/* ═══════ STICKY NAVBAR ═══════ */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? "bg-[#0a0e1a]/95 backdrop-blur-md py-3 shadow-lg" : "bg-transparent py-5"}`}>
@@ -204,16 +205,18 @@ export default function LandingPage() {
 
       {/* ═══════ HERO SECTION ═══════ */}
       <section ref={heroRef} id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-28 sm:py-32">
-        {/* Background — landscape wide render for both mobile and desktop */}
-        <Image
-          src={RENDERS.hero}
-          alt="IJM Harmony — Evening Panoramic View"
-          fill
-          priority
-          className="object-cover object-center transform-gpu"
-          sizes="100vw"
-          quality={80}
-        />
+        {/* Background — Native Responsive Picture Element (100% Identical SSR & CSR HTML) */}
+        <picture className="absolute inset-0 w-full h-full pointer-events-none">
+          <source media="(max-width: 767px)" type="image/webp" srcSet={RENDERS.heroMobile} />
+          <source media="(min-width: 768px)" type="image/webp" srcSet={RENDERS.hero} />
+          <img
+            src={RENDERS.hero}
+            alt="IJM Harmony — Luxury Residence View"
+            className="w-full h-full object-cover object-center transform-gpu"
+            loading="eager"
+            decoding="async"
+          />
+        </picture>
         {/* Dark gradient overlay — lighter at top (nav area), darker below for text */}
         <div className="absolute inset-0 z-[1]" style={{
           background: "linear-gradient(180deg, rgba(4,6,14,0.25) 0%, rgba(4,6,14,0.35) 12%, rgba(4,6,14,0.5) 30%, rgba(4,6,14,0.55) 45%, rgba(4,6,14,0.45) 60%, rgba(6,8,14,0.55) 80%, rgba(6,8,14,0.75) 100%)"

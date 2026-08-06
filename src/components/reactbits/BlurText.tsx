@@ -20,23 +20,8 @@ export default function BlurText({
   direction = 'bottom',
   as: Component = 'span'
 }: BlurTextProps) {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   const elements = animateBy === 'words' ? text.split(' ') : text.split('');
   const initialY = direction === 'top' ? -20 : 20;
-
-  // Static fallback before hydration ensures headings are ALWAYS 100% visible
-  if (!isClient) {
-    return (
-      <Component className={`blur-text ${className} inline-flex flex-wrap justify-center`}>
-        {text}
-      </Component>
-    );
-  }
 
   return (
     <Component className={`blur-text ${className} inline-flex flex-wrap justify-center`}>
