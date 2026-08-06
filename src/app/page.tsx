@@ -164,40 +164,46 @@ export default function LandingPage() {
   return (
     <div suppressHydrationWarning ref={mainRef} className="relative min-h-screen text-[#f5f0e8] bg-[#151515] antialiased selection:bg-[#C29B57] selection:text-[#151515]">
 
-      {/* ═══════ STICKY NAVBAR ═══════ */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? "bg-[#0a0e1a]/95 backdrop-blur-md py-3 shadow-lg" : "bg-transparent py-5"}`}>
+      {/* ═══════ STICKY NAVBAR (High-Contrast Dual State Transition) ═══════ */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out ${
+          isScrolled
+            ? "bg-[#0a0c16]/95 backdrop-blur-md border-b border-[#C29B57]/30 shadow-[0_10px_30px_rgba(0,0,0,0.6)] py-3.5"
+            : "bg-transparent border-b border-transparent py-5"
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            <a href="#hero" className="flex items-center">
-              <Image src="/images/footer-logo.webp" alt="IJM First City" width={72} height={36} className="object-contain lg:w-[96px] lg:h-[48px]" priority />
+            <a href="#hero" className="flex items-center group">
+              <Image src="/images/footer-logo.webp" alt="IJM First City" width={72} height={36} className="object-contain lg:w-[96px] lg:h-[48px] transition-transform duration-300 group-hover:scale-105" priority />
             </a>
-            <nav className="hidden lg:flex items-center gap-8 text-[10px] uppercase tracking-[0.2em] text-[#f5f0e8]/70 font-bold">
-              <a href="#overview" className="hover:text-[#C29B57] transition-colors">Overview</a>
-              <a href="#amenities" className="hover:text-[#C29B57] transition-colors">Amenities</a>
-              <a href="#floor-plans" className="hover:text-[#C29B57] transition-colors">Floor Plans</a>
-              <a href="#gallery" className="hover:text-[#C29B57] transition-colors">Gallery</a>
-              <a href="#configurations" className="hover:text-[#C29B57] transition-colors">Pricing</a>
-              <a href="#connectivity" className="hover:text-[#C29B57] transition-colors">Location</a>
+            <nav className="hidden lg:flex items-center gap-8 text-[11px] uppercase tracking-[0.2em] font-semibold">
+              <a href="#overview" className={`transition-colors duration-200 ${isScrolled ? "text-white hover:text-[#C29B57]" : "text-[#f5f0e8]/80 hover:text-[#C29B57]"}`}>Overview</a>
+              <a href="#amenities" className={`transition-colors duration-200 ${isScrolled ? "text-white hover:text-[#C29B57]" : "text-[#f5f0e8]/80 hover:text-[#C29B57]"}`}>Amenities</a>
+              <a href="#floor-plans" className={`transition-colors duration-200 ${isScrolled ? "text-white hover:text-[#C29B57]" : "text-[#f5f0e8]/80 hover:text-[#C29B57]"}`}>Floor Plans</a>
+              <a href="#gallery" className={`transition-colors duration-200 ${isScrolled ? "text-white hover:text-[#C29B57]" : "text-[#f5f0e8]/80 hover:text-[#C29B57]"}`}>Gallery</a>
+              <a href="#configurations" className={`transition-colors duration-200 ${isScrolled ? "text-white hover:text-[#C29B57]" : "text-[#f5f0e8]/80 hover:text-[#C29B57]"}`}>Pricing</a>
+              <a href="#connectivity" className={`transition-colors duration-200 ${isScrolled ? "text-white hover:text-[#C29B57]" : "text-[#f5f0e8]/80 hover:text-[#C29B57]"}`}>Location</a>
             </nav>
             <div className="flex items-center gap-3">
-              <a href="tel:+919920511119" className="hidden md:flex items-center gap-2 pill-btn pill-btn-outline text-[10px]">
-                <Phone size={12} /><span>+91 99205 11119</span>
+              <a href="tel:+919920511119" className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full border border-[#C29B57]/50 text-[#C29B57] hover:bg-[#C29B57] hover:text-[#0a0c16] text-[10px] font-bold tracking-widest uppercase transition-all duration-200 shadow-sm">
+                <Phone size={12} /><span className="font-sans">+91 99205 11119</span>
               </a>
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden text-white hover:text-[#C29B57] p-1" aria-label="Toggle menu">
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden text-white hover:text-[#C29B57] p-1.5 transition-colors" aria-label="Toggle menu">
                 {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
             </div>
           </div>
         </div>
         {isMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-[#0a0e1a]/95 backdrop-blur-md py-6 px-4 lg:hidden">
-            <nav className="flex flex-col gap-3 text-[11px] uppercase tracking-[0.2em] font-bold text-[#f5f0e8]/70">
-              <a href="#overview" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Overview</a>
-              <a href="#amenities" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Amenities</a>
-              <a href="#floor-plans" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Floor Plans</a>
-              <a href="#gallery" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Gallery</a>
-              <a href="#configurations" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Pricing</a>
-              <a href="#connectivity" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57]">Location</a>
+          <div className="absolute top-full left-0 right-0 bg-[#0a0c16]/98 backdrop-blur-lg border-b border-[#C29B57]/30 shadow-2xl py-6 px-6 lg:hidden">
+            <nav className="flex flex-col gap-3 text-[11px] uppercase tracking-[0.2em] font-bold text-white">
+              <a href="#overview" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57] transition-colors border-b border-white/5">Overview</a>
+              <a href="#amenities" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57] transition-colors border-b border-white/5">Amenities</a>
+              <a href="#floor-plans" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57] transition-colors border-b border-white/5">Floor Plans</a>
+              <a href="#gallery" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57] transition-colors border-b border-white/5">Gallery</a>
+              <a href="#configurations" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57] transition-colors border-b border-white/5">Pricing</a>
+              <a href="#connectivity" onClick={() => setIsMenuOpen(false)} className="py-2 hover:text-[#C29B57] transition-colors">Location</a>
             </nav>
           </div>
         )}
