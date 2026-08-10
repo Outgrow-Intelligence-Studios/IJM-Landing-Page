@@ -220,13 +220,13 @@ export default function LandingPage() {
           <img
             src={RENDERS.hero}
             alt="IJM Harmony — Luxury Residence View"
-            className="w-full h-full object-cover object-center transform-gpu brightness-[1.12] contrast-[1.02] md:brightness-100 md:contrast-100 transition-all duration-300"
+            className="w-full h-full object-cover object-center transform-gpu brightness-[1.15] contrast-[1.03] md:brightness-100 md:contrast-100 transition-all duration-300"
             loading="eager"
             decoding="async"
           />
         </picture>
-        {/* Dark gradient overlay — lighter at top (nav area), darker below for text */}
-        <div className="absolute inset-0 z-[1] opacity-85 md:opacity-100 transition-opacity duration-300" style={{
+        {/* Dark gradient overlay — 15% lighter on mobile screens for enhanced background visibility */}
+        <div className="absolute inset-0 z-[1] opacity-75 md:opacity-100 transition-opacity duration-300" style={{
           background: "linear-gradient(180deg, rgba(4,6,14,0.25) 0%, rgba(4,6,14,0.35) 12%, rgba(4,6,14,0.5) 30%, rgba(4,6,14,0.55) 45%, rgba(4,6,14,0.45) 60%, rgba(6,8,14,0.55) 80%, rgba(6,8,14,0.75) 100%)"
         }}></div>
 
