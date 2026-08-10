@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { trackLeadFormSubmit } from "@/lib/gtm";
+import { submitLead } from "@/lib/leadSubmission";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface LeadForm {
@@ -23,6 +24,7 @@ interface LeadErrors {
 interface LeadCaptureModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 const PHONE_RE = /^[6-9]\d{9}$/;
@@ -39,7 +41,7 @@ function validate(form: LeadForm): LeadErrors {
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
+export default function LeadCaptureModal({ isOpen, onClose, onSuccess }: LeadCaptureModalProps) {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [form, setForm] = useState<LeadForm>({ name: "", phone: "", email: "", config: "2.5 BHK" });
@@ -119,27 +121,22 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     setErrors({});
     setIsSubmitting(true);
 
-    // Send payload to Google Sheets Apps Script Web App
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhoWE8UOBwhLH22xnth2ef7XolaSt1CTjz5GkH-ABjZXE5pO_0gn4UBC9wemmtJO3D/exec";
-    try {
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          phone: form.phone,
-          email: form.email,
-          config: form.config,
-          source: "Popup Lead Modal"
-        }),
-      });
-    } catch (err) {
-      console.error("Google Sheet submission error:", err);
-    } finally {
+    const success = await submitLead({
+      fullName: form.name,
+      mobileNumber: form.phone,
+      emailAddress: form.email,
+      config: form.config,
+      source: "Popup Lead Modal",
+    });
+
+    if (success) {
       trackLeadFormSubmit();
       handleClose();
-      router.push("/thank-you");
+      if (onSuccess) {
+        onSuccess();
+      }
+    } else {
+      setIsSubmitting(false);
     }
   };
 

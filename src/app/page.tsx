@@ -29,6 +29,7 @@ import Magnet from "@/components/reactbits/Magnet";
 import GlareHover from "@/components/reactbits/GlareHover";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
 import { trackLeadFormSubmit } from "@/lib/gtm";
+import { submitLead } from "@/lib/leadSubmission";
 
 // ─── ASSET PATHS (mapped from local renders — WebP for performance) ───
 const RENDERS = {
@@ -131,29 +132,23 @@ export default function LandingPage() {
     if (validateForm(visitForm)) {
       setIsSubmitting(true);
 
-      // Send payload to Google Sheets Apps Script Web App
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhoWE8UOBwhLH22xnth2ef7XolaSt1CTjz5GkH-ABjZXE5pO_0gn4UBC9wemmtJO3D/exec";
-      try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: visitForm.name,
-            phone: visitForm.phone,
-            email: visitForm.email,
-            config: visitForm.config,
-            source: "Inline Website Form"
-          }),
-        });
-      } catch (err) {
-        console.error("Google Sheet submission error:", err);
-      } finally {
+      const success = await submitLead({
+        fullName: visitForm.name,
+        mobileNumber: visitForm.phone,
+        emailAddress: visitForm.email,
+        message: visitForm.message || "",
+        config: visitForm.config,
+        source: "Inline Website Form",
+      });
+
+      if (success) {
         trackLeadFormSubmit();
         setVisitForm({ name: "", phone: "", email: "", config: "2.5 BHK", date: "" });
         setErrors({});
         setIsSubmitting(false);
-        router.push("/thank-you");
+        setShowSuccess(true);
+      } else {
+        setIsSubmitting(false);
       }
     }
   };
@@ -1065,6 +1060,7 @@ export default function LandingPage() {
       <LeadCaptureModal
         isOpen={isLeadModalOpen}
         onClose={() => setIsLeadModalOpen(false)}
+        onSuccess={() => setShowSuccess(true)}
       />
 
       {/* ═══════ SUCCESS MODAL ═══════ */}
