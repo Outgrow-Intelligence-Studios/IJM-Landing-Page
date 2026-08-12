@@ -21,6 +21,13 @@ export const metadata: Metadata = {
   description: "Experience luxury living at IJM First City Mihan, Nagpur. A premium 7.5-acre gated community featuring 690 apartments, 100+ amenities, clubhouse, and unmatched connectivity. Enquire now for starting price ₹73 Lakhs.",
   keywords: "IJM First City, First City Nagpur, MIHAN apartments, flats in Nagpur, Harmony Mihan, Symphony Mihan, Nagpur property, IJM Group",
   authors: [{ name: "Nagpur Integrated Township Pvt. Ltd." }],
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 export const viewport = {
